@@ -2,28 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use App\Models\Employee;
 use App\Models\Image;
 use App\Models\Log;
 use App\Models\Payroll;
 use App\Models\User;
-use App\Models\QRLogin;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
-//QR Code
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\Request;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
-use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
+
+
 
 class AdminController extends Controller
 {
@@ -53,144 +51,15 @@ class AdminController extends Controller
             ->whereDate('created_at', $this->current)
             ->get();
     }
-    public function index(): View
-    {
-        $emp = Employee::all();
-        foreach ($emp as $e) {
-            $qr = QRLogin::where('userName', $e->userName)->latest()->first();
-            $last = Carbon::parse($qr->updated_at);
-            $diff = $last->diffInDays(Carbon::now());
-            if ($diff >= 30) {
-                $temp = [];
-                $temp['eStatus'] = 'INACTIVE';
-                $e->update($temp);
-            }
-        }
-        $month = Payroll::where('month_id', $this->monthId)->get();
-        $year = Payroll::where('year_id', $this->yearId)->get();
-        $status = Employee::where('eStatus', "INACTIVE")->count();
-        $netM = 0;
-        $netY = 0;
-        foreach ($month as $data) {
-            $netM += $data->net;
-        };
-        foreach ($year as $data) {
-            $netY += $data->net;
-        };
-        $count = Employee::count();
-        return view('admin.index', [
-            'week' => $this->weekId,
-            'month' => $netM,
-            'year' => $netY,
-            'count' => $count,
-            'status' => $status,
-            'log' => $this->log,
-        ]);
-    }
-    public function empIndex(): View
-    {
-        return view('admin.emp', [
-            'log' => $this->log,
-        ]);
-    }
-
-    public function empView(): View
-    {
-        $employee = Employee::paginate(5);
-        return view('admin.view', [
-            'employees' => $employee,
-            'log' => $this->log,
-        ]);
-    }
-    public function payView(Request $request): View
-    {
-        $week = $this->firstDay . ' - ' . $this->lastDay;
-        $payroll = Payroll::where('week_id', $this->weekId)->get();
-        if (count($payroll) >= 1) {
-            foreach ($payroll as $pay) {
-                $temp = [];
-                $temp['week'] = $week;
-                $pay->update($temp);
-            }
-        } else {
-            if (Payroll::count() >= 1) {
-                $weekId = Carbon::now()->subWeek()->startOfWeek()->week();
-                $payroll = Payroll::where('week_id', $weekId)->get();
-                foreach ($payroll as $pay) {
-                    $temp = [];
-                    $temp['pay_id'] = Functions::payId();
-                    $temp['name'] = $pay->name;
-                    $temp['userName'] = $pay->userName;
-                    $temp['employee_id'] = $pay->employee_id;
-                    $temp['week_id'] = $this->weekId;
-                    $temp['month_id'] = $this->monthId;
-                    $temp['year_id'] = $this->yearId;
-                    $temp['week'] = $week;
-                    $temp['job'] = $pay->job;
-                    $temp['rate'] = $pay->rate;
-                    $temp['rph'] = $pay->rate / 8 + ($pay->rate / 8) * 0.2;
-                    $request->user()->payroll()->create($temp);
-                }
-            }
-        }
-        return view('admin.pay', [
-            'payroll' => Payroll::where('week_id', $this->weekId)->paginate(8),
-            'log' => $this->log,
-        ]);
-    }
-    public function payEdit($id): View
-    {
-        $payroll = Payroll::find($id);
-        Gate::authorize('update', $payroll);
-        return view('admin.editPayroll', [
-            'payroll' => $payroll,
-        ]);
-    }
-    public function payUpdate(Request $request, $id): RedirectResponse
+    public function addEmp(Request $request)
     {
         try {
-            $payroll = Payroll::find($id);
-            Gate::authorize('update', $payroll);
-            $validated = $request->validate([
-                'rate' => 'nullable|string|uppercase|max:255',
-                'holiday' => 'nullable|string|uppercase|max:255',
-                'sss' => 'nullable|string|uppercase|max:255',
-                'philhealth' => 'nullable|string|uppercase|max:255',
-                'advance' => 'nullable|string|uppercase|max:255',
-            ]);
-            $validated['gross'] = $request->holiday + $payroll->gross;
-            $validated['deduction'] = $validated['philhealth'] + $validated['sss'] + $validated['advance'];
-            $validated['net'] = $validated['gross'] - $validated['deduction'];
-            $payroll->update($validated);
-            $changes = $payroll->getChanges();
-            unset($changes['updated_at']);
-            $columns = [];
-            foreach ($changes as $attribute => $values) {
-                $columns[] = $attribute;
-            }
-            $sentence = Str::title(implode(', ', $columns));
-            $log = [];
-            $log['title'] = "EDIT PAYROLL";
-            $log['log'] = "User " . $this->admin->userName . " edited " . $payroll->userName . " details. The columns edited are " . $sentence . ".";
-            $request->user()->log()->create($log);
-            return redirect(route('a-payroll'))->with('success', 'Successfully Updated Payroll.');
-        } catch (\Exception $e) {
-            return redirect(route('a-payroll'))->with('danger', $e->getMessage());
-        }
-    }
-
-
-    public function store(Request $request): RedirectResponse
-    {
-        $week = $this->firstDay . ' - ' . $this->lastDay;
-        try {
-            //Create Employee
             $validated = $request->validate([
                 'role' => 'nullable|string|uppercase|max:255',
-                'userName' => 'nullable|string|uppercase|max:255',
-                'first' => 'nullable|string|uppercase|max:255',
-                'middle' => 'nullable|string|uppercase|max:255',
-                'last' => 'nullable|string|uppercase|max:255',
+                'user_name' => 'nullable|string|uppercase|max:255',
+                'first_name' => 'nullable|string|uppercase|max:255',
+                'middle_name' => 'nullable|string|uppercase|max:255',
+                'last_name' => 'nullable|string|uppercase|max:255',
                 'status' => 'nullable|string|uppercase|max:255',
                 'email' => 'nullable|string|uppercase|max:255',
                 'phone' => 'nullable|string|uppercase|max:255',
@@ -202,21 +71,18 @@ class AdminController extends Controller
                 'ePhone' => 'nullable|string|uppercase|max:255',
                 'eAdd' => 'nullable|string|uppercase|max:255',
             ]);
-            $name = $request->last . ', ' . $request->first . ' ' . $request->middle;
             $validated['eStatus'] = "ACTIVE";
-            $validated['name'] = $name;
-            $validated['created_by'] = $this->admin->name;
+            $name = $request->last_name . ', ' . $request->first_name . ' ' . $request->middle_name;
             Employee::create($validated);
             $employee = Employee::latest()->first();
-
             //Get Image
-            $userName = $request->userName;
-            $fileName = $userName . '-' . time() . '.' . $request->image->extension();
+            $user_name = $request->user_name;
+            $fileName = $user_name . '-' . time() . '.' . $request->image->extension();
             $imageData = file_get_contents($request->file('image')->getRealPath());
 
             //Get QR
             $writer = new PngWriter();
-            $qrCode = QrCode::create($userName)
+            $qrCode = QrCode::create($user_name)
                 ->setEncoding(new Encoding('UTF-8'))
                 ->setErrorCorrectionLevel(ErrorCorrectionLevel::Low)
                 ->setSize(300)
@@ -232,72 +98,58 @@ class AdminController extends Controller
             $imagePath = 'images/' . $fileName;
             Storage::disk('public')->delete($imagePath);
 
+            //Create Payroll
+            $payroll = [];
+            $payroll['pay_id'] = FunctionController::payId();
+            $payroll['name'] = $name;
+            $payroll['user_name'] = $user_name;
+            $payroll['week_id'] = $this->weekId;
+            $payroll['month_id'] = $this->monthId;
+            $payroll['year_id'] = $this->yearId;
+            $payroll['job'] = $request->job;
+            $payroll['rate'] = $request->rate;
+            $payroll['rph'] = $request->rate / 8 + ($request->rate / 8) * 0.2;
+            $employee->payroll()->create($payroll);
+
             // Save Image And QR
             $image = [];
-            $image['userName'] = $userName;
+            $image['user_name'] = $user_name;
             $image['image_name'] = $fileName;
             $image['image_data'] = $imageData;
             $image['qr_data'] = $qrData;
             $employee->image()->create($image);
 
-            //Create Payroll
-            $payroll = [];
-            $payroll['pay_id'] = Functions::payId();
-            $payroll['name'] = $name;
-            $payroll['userName'] = $userName;
-            $payroll['employee_id'] = $employee->id;
-            $payroll['week_id'] = $this->weekId;
-            $payroll['month_id'] = $this->monthId;
-            $payroll['year_id'] = $this->yearId;
-            $payroll['week'] = $week;
-            $payroll['job'] = $request->job;
-            $payroll['rate'] = $request->rate;
-            $payroll['rph'] = $request->rate / 8 + ($request->rate / 8) * 0.2;
-            $request->user()->payroll()->create($payroll);
-
             $user = [];
-            $user['employee_id'] = $employee->id;
             $user['name'] = $name;
-            $user['userName'] = $userName;
-            $user['userType'] = 'USER';
-            $user['password'] = Hash::make($request->last);
-            User::create($user);
+            $user['user_name'] = $user_name;
+            $user['email'] = $employee->email;
+            $user['password'] = Hash::make($employee->last_name);
+            $employee->user()->create($user);
 
-            $log = [];
-            $log['title'] = "ADD EMPLOYEE";
-            $log['log'] = "User " . $this->admin->userName . " added " . $userName . ".";
-            $request->user()->log()->create($log);
-            return redirect('admin/employee')->with('success', 'Successfully added employee.');
-        } catch (\Exception $e) {
-            return redirect('admin/employee')->with('danger', $e->getMessage());
+            $user = User::where('user_name', $this->admin->user_name)->first();
+            $log = new Log();
+            $log->title = 'CREATE RECORD';
+            $log->log = 'Admin ' . auth()->user()->user_name . ' created ' . $employee->user_name;
+            $log->user()->associate($user);
+            $log->save();
+            return redirect()->route('a-empView')->with('success', 'Successfully added employee.');
+        } catch (Exception $e) {
+            return redirect()->route('a-addEmp')->with('danger', $e->getMessage());
         }
     }
-
-    public function edit($id): View
-    {
-        $employee = Employee::find($id);
-        $payroll = Payroll::find($id);
-        $image = Image::find($id);
-        return view('admin.editEmp', [
-            'employee' => $employee,
-            'payroll' => $payroll,
-            'image' => $image,
-            'log' => $this->log,
-        ]);
-    }
-
-    public function update(Request $request, $id): RedirectResponse
+    public function updateEmp(Request $request, $id)
     {
         try {
             $employee = Employee::find($id);
-            $payroll = Payroll::where('userName', $employee->userName)->first();
-            $user = User::where('userName', $employee->userName)->first();
+            $user = User::where('user_name', $employee->user_name)->first();
+            $image = Image::where('user_name', $employee->user_name)->first();
+            $payroll = Payroll::where('user_name', $employee->user_name)->first();
             $validated = $request->validate([
                 'role' => 'nullable|string|uppercase|max:255',
-                'userName' => 'nullable|string|uppercase|max:255',
-                'first' => 'nullable|string|uppercase|max:255',
-                'middle' => 'nullable|string|uppercase|max:255',
-                'last' => 'nullable|string|uppercase|max:255',
+                'user_name' => 'nullable|string|uppercase|max:255',
+                'first_name' => 'nullable|string|uppercase|max:255',
+                'middle_name' => 'nullable|string|uppercase|max:255',
+                'last_name' => 'nullable|string|uppercase|max:255',
                 'status' => 'nullable|string|uppercase|max:255',
                 'email' => 'nullable|string|uppercase|max:255',
                 'phone' => 'nullable|string|uppercase|max:255',
@@ -312,60 +164,179 @@ class AdminController extends Controller
             ]);
             if (isset($request->promote)) {
                 $validated['role'] = 'EMPLOYEE';
+                //Get QR
+                $writer = new PngWriter();
+                $qrCode = QrCode::create($request->user_name)
+                    ->setEncoding(new Encoding('UTF-8'))
+                    ->setErrorCorrectionLevel(ErrorCorrectionLevel::Low)
+                    ->setSize(300)
+                    ->setMargin(10)
+                    ->setRoundBlockSizeMode(RoundBlockSizeMode::Margin)
+                    ->setForegroundColor(new Color(0, 0, 0))
+                    ->setBackgroundColor(new Color(255, 255, 255));
+                $result = $writer->write($qrCode);
+
+                //Save File
+                $fileName = $request->user_name . '-' . time() . '.png';
+                $result->saveToFile(public_path('images/' . $fileName));
+                $qrData = file_get_contents(public_path('images/' . $fileName));
+                $imagePath = 'images/' . $fileName;
+                Storage::disk('public')->delete($imagePath);
+                $image->user_name = $request->user_name;
+                $image->image_name = $fileName;
+                $image->qr_data = $qrData;
+                $image->save();
             }
-            $validated['name'] = $request->last . ', ' . $request->first . ' ' . $request->middle;
-            $validated['edited_by'] = $this->admin->name;
+            $validated['name'] = $request->last_name . ', ' . $request->first_name . ' ' . $request->middle_name;
+            $payroll->user_name = $request->user_name;
+            $payroll->name = $validated['name'];
+            $payroll->job = $request->job;
+            $payroll->save();
             $employee->update($validated);
-            $payroll->update($validated);
             $user->update($validated);
             if ($request->hasFile('image')) {
                 $image = Image::where('employee_id', $employee->id)->first();
-                $userName = $request->userName;
-                $fileName = $userName . '-' . time() . '.' . $request->image->extension();
+                $user_name = $request->user_name;
+                $fileName = $user_name . '-' . time() . '.' . $request->image->extension();
                 $imageData = file_get_contents($request->file('image')->getRealPath());
                 $temp = [];
                 $temp['image_name'] = $fileName;
                 $temp['image_data'] = $imageData;
                 $image->update($temp);
             }
+
+            $user = User::where('user_name', $this->admin->user_name)->first();
+            $log = new Log();
+            $log->title = 'UPDATE RECORD';
             $changes = $employee->getChanges();
+            unset($changes['updated_at']);
+            if (!empty($changes)) {
+                $columns = [];
+                foreach ($changes as $attribute => $values) {
+                    $columns[] = $attribute;
+                }
+                $sentence = Str::title(implode(', ', $columns));
+                $log->log = 'Admin ' . auth()->user()->user_name . ' updated ' . $employee->user_name . 'The columns edited are ' . $sentence . '.';
+            } else {
+                $log->log = 'Admin ' . auth()->user()->user_name . ' updated. ';
+            }
+            $log->user()->associate($user);
+            $log->save();
+            return redirect()->route('a-empView')->with('success', 'Successfully edited employee.');
+        } catch (Exception $e) {
+            return redirect()->route('a-editEmp')->with('danger', $e->getMessage());
+        }
+    }
+    public function deleteEmp($id)
+    {
+        try {
+            $employee = Employee::find($id);
+            $temp = $employee->user_name;
+            $employee->delete();
+            $user = User::where('user_name', $this->admin->user_name)->first();
+            $log = new Log();
+            $log->title = 'DELETE RECORD';
+            $log->log = 'Admin ' . auth()->user()->user_name . ' deleted ' . $temp;
+            $log->user()->associate($user);
+            $log->save();
+            return redirect()->back()->with('success', 'Successfully Deleted Employee.');;
+        } catch (Exception $e) {
+            return redirect()->back()->with('danger', $e->getMessage());
+        }
+    }
+    public function updatePay(Request $request, $id)
+    {
+        try {
+            $temp = $request->all();
+            if (empty($temp)) {
+                return redirect()->route('a-editPay')->with('danger', 'No data to be updated.');
+            }
+            $data = [];
+            foreach ($temp as $key => $value) {
+                if ($key == '_token' || $key == '_method' || $value == null) {
+                    continue;
+                } else {
+                    $data[$key] = $value;
+                }
+            }
+            $payroll = Payroll::findOrFail($id);
+            $payroll->update($data);
+            $user = User::where('user_name', $this->admin->user_name)->first();
+            $log = new Log();
+            $log->title = 'UPDATE PAYROLL';
+            $changes = $payroll->getChanges();
             unset($changes['updated_at']);
             $columns = [];
             foreach ($changes as $attribute => $values) {
                 $columns[] = $attribute;
             }
-            $sentence = implode(', ', $columns);
-            $log = [];
-            $log['title'] = "EDIT EMPLOYEE";
-            $log['log'] = "User " . $this->admin->userName . " edited " . $employee->userName . " details. The columns edited are " . $sentence . ".";
-            $request->user()->log()->create($log);
-            return redirect(route('a-view'))->with('success', 'Successfully Updated Employee.');
-        } catch (\Exception $e) {
-            dd($e);
-            return redirect(route('a-view'))->with('danger', $e->getMessage());
+            $sentence = Str::title(implode(', ', $columns));
+            $log->log = 'Admin ' . auth()->user()->user_name . ' updated ' . $payroll->user_name . '. The columns edited are ' . $sentence . '.';
+            $log->user()->associate($user);
+            $log->save();
+            return redirect()->route('a-payView')->with('success', 'Successfully edited payroll.');
+        } catch (Exception $e) {
+            return redirect()->route('a-editPay')->with('danger', $e->getMessage());
         }
     }
-    public function destroy($id)
+    public function payslip($id)
     {
-        try {
-            $employee = Employee::find($id);
-            $employee->delete();
-            $admin = User::find($this->admin->id);
-            $log = [];
-            $log['title'] = "DELETE EMPLOYEE";
-            $log['log'] = "User " . $this->admin->userName . " deleted " . $employee->userName . ".";
-            $admin->log()->create($log);
-            return redirect(route('a-view'))->with('success', 'Successfully Deleted Employee.');;
-        } catch (\Exception $e) {
-            return redirect(route('a-view'))->with('danger', $e->getMessage());
+        $payroll = Payroll::findOrFail($id);
+        $convert = FunctionController::convert_number_to_words($payroll->net);
+        if ($convert == false) {
+            $convert = "zero";
         }
-    }
-
-    public function payrollAll()
-    {
-        return view('admin.pay', [
-            'payroll' => Payroll::paginate(8),
-            'log' => $this->log,
+        $pdf = Pdf::loadView('print.payslip', [
+            'convert' => $convert,
+            'payroll' => $payroll,
         ]);
+        return $pdf->stream('INVOICE');
+    }
+    public function payroll($page)
+    {
+        $data = Payroll::where('week_id', $this->weekId)->get();
+        $data = $data->slice(($page - 1) * 8, 8);
+        $salary = 0;
+        $rph = 0;
+        $hrs = 0;
+        $ot = 0;
+        $holiday = 0;
+        $philhealth = 0;
+        $sss = 0;
+        $advance = 0;
+        $gross = 0;
+        $deduction = 0;
+        $net = 0;
+        foreach ($data as $key) {
+            $salary += $key->salary;
+            $rph += $key->rph;
+            $hrs += $key->hrs;
+            $ot += $key->otpay;
+            $holiday += $key->holiday;
+            $philhealth += $key->philhealth;
+            $sss += $key->sss;
+            $advance += $key->advance;
+            $gross += $key->gross;
+            $deduction += $key->deduction;
+            $net += $key->net;
+        }
+        $total = new Employee();
+        $total->salary = $salary;
+        $total->rph = $rph;
+        $total->hrs = $hrs;
+        $total->otpay = $ot;
+        $total->holiday = $holiday;
+        $total->philhealth = $philhealth;
+        $total->sss = $sss;
+        $total->advance = $advance;
+        $total->gross = $gross;
+        $total->deduction = $deduction;
+        $total->net = $net;
+
+        $pdf = Pdf::setPaper('A4', 'landscape')->loadView('print.payroll', [
+            'payroll' => $data,
+            'total' => $total,
+        ]);
+        return $pdf->stream('INVOICE');
     }
 }

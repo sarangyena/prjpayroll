@@ -16,16 +16,14 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'userName' => 'admin',
-            'userType' => 'ADMIN',
+            'user_name' => 'superadmin',
+            'name' => 'superadmin',
+            'user_type' => 'ADMIN',
         ]);
         User::factory()->create([
-            'userName' => 'user',
-            'userType' => 'USER',
-        ]);
-        User::factory()->create([
-            'userName' => 'qr',
-            'userType' => 'QR',
+            'user_name' => 'superqr',
+            'name' => 'superqr',
+            'user_type' => 'QR',
         ]);
     }
 }

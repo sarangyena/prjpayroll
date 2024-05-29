@@ -6,19 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-
 class Payroll extends Model
 {
     use HasFactory;
     protected $fillable = [
         'pay_id',
-        'userName',
-        'employee_id',
-        'name',
+        'user_name',
         'week_id',
         'month_id',
         'year_id',
-        'week',
+        'name',
         'job',
         'rate',
         'days',

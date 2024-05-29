@@ -1,4 +1,4 @@
-<form method="POST" action="{{ isset($employee) ? route('a-update', $employee) : route('a-store') }}" id="empForm"
+<form method="POST" action="{{ isset($employee) ? route('a-updateEmp', $employee) : route('a-addEmp') }}" id="empForm"
     enctype="multipart/form-data">
     @csrf
     @if (isset($employee))
@@ -11,17 +11,12 @@
     <div class="columns-2 py-2">
         <img src="{{ asset('images/user.png') }}" class="w-52 h-max mx-auto" id="imagePreview">
         <x-input-label for="imagePreview" :value="__('Upload Employee Image:')" />
-        @if (isset($employee))
-            <x-text-input id="image" class="block mt-1 w-full uppercase" type="file" name="image"
-                accept="image/*" />
-        @else
-            <x-text-input id="image" class="block mt-1 w-full uppercase" type="file" name="image"
-                accept="image/*" required />
-        @endif
+        <x-text-input id="image" class="block mt-1 w-full uppercase" type="file" name="image"
+            accept="image/*" />
         <div class="mt-2">
-            <x-input-label for="userName" :value="__('User ID:')" />
-            <x-text-input id="userName" class="block mt-1 w-full uppercase" type="text" name="userName" readonly
-                value="{{ isset($employee) ? $employee->userName : null }}" required />
+            <x-input-label for="user_name" :value="__('User ID:')" />
+            <x-text-input id="user_name" class="block mt-1 w-full uppercase" type="text" name="user_name" readonly
+                value="{{ isset($employee) ? $employee->user_name : null }}" />
         </div>
         @if (isset($employee) && $employee->role == 'ON-CALL')
             <div class="mt-3 flex items-center mb-4">
@@ -34,10 +29,10 @@
             <div class="flex gap-5 py-5">
                 <x-input-label for="imagePreview" :value="__('Role:')" />
                 <input type="radio" id="emp" name="role" value="EMPLOYEE"
-                    @if (isset($employee) && $employee->role == 'EMPLOYEE') checked @endif required>
+                    @if (isset($employee) && $employee->role == 'EMPLOYEE') checked @endif>
                 <x-input-label for="emp" :value="__('EMPLOYEE')" />
                 <input type="radio" id="on" name="role" value="ON-CALL"
-                    @if (isset($employee) && $employee->role == 'ON-CALL') checked @endif required>
+                    @if (isset($employee) && $employee->role == 'ON-CALL') checked @endif>
                 <x-input-label for="on" :value="__('ON-CALL')" />
             </div>
         @endif
@@ -45,15 +40,15 @@
 
     </div>
     <div class="mt-2 columns-3">
-        <x-input-label for="last" :value="__('Last Name:')" />
-        <x-text-input id="last" class="block mt-1 w-full uppercase" type="text" name="last"
-            value="{{ isset($emp) ? $emp[0] : null }}" required />
-        <x-input-label for="first" :value="__('First Name:')" />
-        <x-text-input id="first" class="block mt-1 w-full uppercase" type="text" name="first"
-            value="{{ isset($emp) ? $emp[1] : null }}" required />
-        <x-input-label for="middle" :value="__('Middle Name:')" />
-        <x-text-input id="middle" class="block mt-1 w-full uppercase" type="text" name="middle"
-            value="{{ isset($emp) ? $emp[2] : null }}" />
+        <x-input-label for="last_name" :value="__('Last Name:')" />
+        <x-text-input id="last_name" class="block mt-1 w-full uppercase" type="text" name="last_name"
+            value="{{ isset($employee) ? $employee->last_name : null }}" />
+        <x-input-label for="first_name" :value="__('First Name:')" />
+        <x-text-input id="first_name" class="block mt-1 w-full uppercase" type="text" name="first_name"
+            value="{{ isset($employee) ? $employee->first_name : null }}" />
+        <x-input-label for="middle_name" :value="__('Middle Name:')" />
+        <x-text-input id="middle_name" class="block mt-1 w-full uppercase" type="text" name="middle_name"
+            value="{{ isset($employee) ? $employee->middle_name : null }}" />
     </div>
     <div class="mt-2 columns-3">
         <x-input-label for="status" :value="__('Status:')" />
@@ -73,12 +68,13 @@
     </div>
     <div class="mt-2 columns-3">
         <x-input-label for="job" :value="__('Job:')" />
-        <x-select-input id="job" name="job" class="mt-1" required>
+        <x-select-input id="job" name="job" class="mt-1">
             <option selected disabled value="{{ isset($employee) ? $employee->job : null }}">
                 {{ isset($employee) ? $employee->job : '----------' }}</option>
             <option value="AREA MANAGER">AREA MANAGER</option>
             <option value="BOOK KEEPER">BOOK KEEPER</option>
             <option value="CASHIER">CASHIER</option>
+            <option value="COLLECTOR">COLLECTOR</option>
             <option value="FARMERS">FARMERS</option>
             <option value="FARM MANAGER">FARM MANAGER</option>
             <option value="GENERAL MANAGER">GENERAL MANAGER</option>
@@ -95,14 +91,15 @@
         <x-text-input id="philhealth" class="block mt-1 w-full uppercase" type="text" name="philhealth"
             value="{{ isset($employee) ? $employee->philhealth : null }}" />
     </div>
-    <x-input-label for="rate" :value="__('Rate:')" class="mt-2" />
-    <x-text-input id="rate" class="block mt-1 w-full uppercase" type="text" name="rate"
-        value="{{ isset($employee) ? $employee->rate : null }}" value="430" required />
-
-    <p class="font-semibold text-2xl leading-5 border-b-2 pb-2 mt-2 border-green-300">ADDRESS:</p>
+    @if (!isset($employee))
+        <x-input-label for="rate" :value="__('Rate:')" class="mt-2" />
+        <x-text-input id="rate" class="block mt-1 w-full uppercase" type="text" name="rate"
+            value="{{ isset($employee) ? $employee->rate : null }}" value="430" />
+    @endif
+    <p class="font-semibold text-2xl leading-5 border-b-2 pb-2 mt-3 border-green-300">ADDRESS:</p>
     <x-input-label for="address" :value="__('Address:')" />
     <x-text-input id="address" class="block mt-1 w-full uppercase" type="text" name="address"
-        value="{{ isset($employee) ? $employee->address : null }}" required />
+        value="{{ isset($employee) ? $employee->address : null }}" />
     <p class="font-semibold text-2xl leading-5 border-b-2 pb-2 mt-2 border-green-300">EMERGENCY
         CONTACT:</p>
     <x-input-label for="eName" :value="__('Full Name:')" />
@@ -118,75 +115,10 @@
         <x-primary-button class="m-3">
             {{ isset($employee) ? __('Save') : __('Add') }}
         </x-primary-button>
-        <x-secondary-button id="clear" class="m-3">
-            {{ __('Clear') }}
-        </x-secondary-button>
+        @if (!isset($employee))
+            <x-secondary-button id="clear" class="m-3">
+                {{ __('Clear') }}
+            </x-secondary-button>
+        @endif
     </div>
 </form>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script>
-    $(document).ready(function() {
-        var userId = document.getElementById("userName");
-        var temp = userId.value;
-        //Convert to Uppercase
-        $('#empForm input[type="text"]').on('input', function() {
-            $(this).val($(this).val().toUpperCase());
-        });
-        $('#empForm input[type="email"]').on('input', function() {
-            $(this).val($(this).val().toUpperCase());
-        });
-        // EMPLOYEE
-        $('#emp').change(function() {
-            if ($(this).is(':checked')) {
-                const data = {
-                    role: 'EMPLOYEE'
-                };
-                axios.post('username', data)
-                    .then(response => {
-                        userId.value = response.data;
-                        // Handle successful response
-                    })
-                    .catch(error => {
-                        console.error(error.response.data);
-                        // Handle error
-                    });
-            }
-        });
-        // ON-CALL
-        $('#on').change(function() {
-            if ($(this).is(':checked')) {
-                const data = {
-                    role: 'ON-CALL'
-                };
-                axios.post('username', data)
-                    .then(response => {
-                        userId.value = response.data;
-                        // Handle successful response
-                    })
-                    .catch(error => {
-                        console.error(error.response.data);
-                        // Handle error
-                    });
-            }
-        });
-        $('#promote').change(function() {
-            if ($(this).is(':checked')) {
-                const data = {
-                    role: 'EMPLOYEE'
-                };
-                axios.post('username', data)
-                    .then(response => {
-                        userId.value = response.data;
-                        // Handle successful response
-                    })
-                    .catch(error => {
-                        console.error(error.response.data);
-                        // Handle error
-                    });
-            } else {
-                userId.value = temp;
-            }
-        });
-    });
-</script>

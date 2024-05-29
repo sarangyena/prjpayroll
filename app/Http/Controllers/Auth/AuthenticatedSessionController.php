@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Log;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -13,16 +14,6 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    private $admin;
-    private $current;
-
-    public function __construct()
-    {
-        //Dates
-        $this->current = Carbon::today();
-        //Admin
-        $this->admin = auth()->user();
-    }
     /**
      * Display the login view.
      */
@@ -38,16 +29,18 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
-        if($request->user()->userType === 'ADMIN'){
-            $log = [];
-            $log['title'] = "LOGIN";
-            $log['log'] = "User " . $request->user()->userName . " login.";
-            $request->user()->log()->create($log);
-            return redirect('admin/dashboard');
-        }else if($request->user()->userType === 'QR'){
-            return redirect('qr');
+        if(User::where('user_name', $request->user_name)->first()->user_type == "USER"){
+            return redirect()->intended(route('u-dashboard', absolute: false));
+        }else if(User::where('user_name', $request->user_name)->first()->user_type == "QR"){
+            return redirect()->intended(route('qr-scanner', absolute: false));
         }else{
-            return redirect('employee/dashboard');
+            $user = User::where('user_name', $request->user_name)->first();
+            $log = new Log();
+            $log->title = 'LOGIN';
+            $log->log = 'Admin '.auth()->user()->user_name.' login at '.Carbon::now();
+            $log->user()->associate($user);
+            $log->save();
+            return redirect()->intended(route('a-dashboard', absolute: false));
         }
     }
 
@@ -56,16 +49,18 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $userName = $this->admin->userName;
+        $user = User::where('user_name', auth()->user()->user_name)->first();
+        $log = new Log();
+        $log->title = 'LOG OUT';
+        $log->log = 'Admin '.auth()->user()->user_name.' logout at '.Carbon::now();
+        $log->user()->associate($user);
+        $log->save();
         Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
 
-        $user = User::where("userName", $userName)->first();
-        $log = [];
-        $log['title'] = "LOGOUT";
-        $log['log'] = "User ".$userName." logout.";
-        $user->log()->create( $log );
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+        
         return redirect('/');
     }
 }

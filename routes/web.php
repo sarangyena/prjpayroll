@@ -1,68 +1,69 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\Functions;
-use App\Http\Controllers\PrintController;
+use App\Http\Controllers\FunctionController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\QR;
+use App\Http\Controllers\QRController;
+use App\Http\Controllers\ViewController;
 use Illuminate\Support\Facades\Route;
 
-
-//If authenticated, go to dashboard
-Route::get('/', function (  ) {
+Route::get('/', function () {
     return view('auth.login');
 });
 
-//Admin
-Route::middleware(['auth', 'admin'])->group(function () {
-    //Employee
-    Route::get('admin/dashboard', [AdminController::class, 'index'])->name('a-dash');
-    Route::get('admin/employee', [AdminController::class, 'empIndex'])->name('a-employee');
-    Route::post('admin/store', [AdminController::class, 'store'])->name('a-store');
-    Route::get('admin/view', [AdminController::class, 'empView'])->name('a-view');
-    Route::post('admin/username', [Functions::class, 'getUserName'])->name('username');
-    Route::post('admin/{id}/username', [Functions::class, 'getUserName'])->name('username1');
-    Route::get('admin/{id}/edit', [AdminController::class, 'edit'])->name('a-edit');
-    Route::patch('admin/{id}/employee', [AdminController::class, 'update'])->name('a-update');
-    Route::delete('admin/{id}', [AdminController::class, 'destroy'])->name('a-delete');
-    Route::get('admin/{id}/qr', [Functions::class, 'QR'])->name('a-qr');
+Route::middleware(['role:QR'])->group(function () {
+    Route::get('/scanner', [ViewController::class, 'qrScanner'])->name('qr-scanner');
+    Route::post('/scanner', [QRController::class, 'store'])->name('qr-store');
+    Route::post('qr/data', [QRController::class, 'data']);
+    Route::post('qr/image', [QRController::class, 'image']);
+    Route::post('qr/store', [QRController::class, 'store']);
+    Route::get('/session', [FunctionController::class, 'qrSession']);
 
-    //Payroll
-    Route::get('admin/payroll', [AdminController::class, 'payView'])->name('a-payroll');
-    Route::get('admin/all', [AdminController::class, 'payrollAll'])->name('a-all');
-    Route::get('admin/{id}/payroll', [AdminController::class, 'payEdit'])->name('a-payEdit');
-    Route::patch('admin/{id}/payroll', [AdminController::class, 'payUpdate'])->name('a-payUpdate');
+
+
+    
+
+});
+Route::middleware(['role:USER'])->group(function () {
+    Route::get('user/dashboard', [ViewController::class, 'userDash'])->name('u-dashboard');
+    Route::get('user/payroll', [ViewController::class, 'empPay'])->name('u-payroll');
 });
 
-//Employee
-Route::middleware(['auth', 'user'])->group(function () {
-    Route::get('employee/dashboard', [EmployeeController::class, 'index'])->name('e-dash');
-    Route::get('employee/salary', [EmployeeController::class, 'salary'])->name('e-salary');
-    Route::get('employee/qr', [EmployeeController::class, 'qr'])->name('e-qr');
+Route::middleware(['role:ADMIN'])->group(function () {
+    //Views
+    Route::get('/dashboard', [ViewController::class, 'adminDash'])->name('a-dashboard');
+    Route::get('/empView', [ViewController::class, 'empView'])->name('a-empView');
+    Route::get('/payView', [ViewController::class, 'payView'])->name('a-payView');
+    Route::get('/qrView', [ViewController::class, 'qrView'])->name('a-qrView');
+    Route::get('/addEmp', [ViewController::class, 'addEmp'])->name('a-addEmp');
+    Route::get('/editEmp/{id}', [ViewController::class, 'editEmp'])->name('a-editEmp');
+    Route::get('/editPay/{id}', [ViewController::class, 'editPay'])->name('a-editPay');
+
+
+    //Process
+    Route::post('/addEmp', [AdminController::class, 'addEmp'])->name('a-addEmp');
+    Route::patch('/updateEmp/{id}', [AdminController::class, 'updateEmp'])->name('a-updateEmp');
+    Route::delete('/deleteEmp/{id}', [AdminController::class, 'deleteEmp'])->name('a-deleteEmp');
+    Route::patch('/updatePay/{id}', [AdminController::class, 'updatePay'])->name('a-updatePay');
+    Route::get('/payslip/{id}/', [AdminController::class, 'payslip'])->name('p-payslip');
+    Route::get('/payroll/{id}/', [AdminController::class, 'payroll'])->name('p-payroll');
+
+    //Functions
+    Route::get('/qr/{id}', [FunctionController::class, 'QR'])->name('a-qr');
+    Route::post('/username', [FunctionController::class, 'username'])->name('username');
+    Route::post('{id}/username', [FunctionController::class, 'username']);
+    Route::post('month', [FunctionController::class, 'month']);
+    Route::post('year', [FunctionController::class, 'year']);
+
+
 });
 
 
-//QR Login
-Route::middleware(['auth', 'QR'])->group(function () {
-    Route::get('qr', [QR::class, 'index'])->name('qr');
-    Route::get('qr/view', [QR::class, 'view'])->name('qr-view');
-    Route::post('qr/find', [QR::class, 'find']);
-    Route::post('qr/image', [QR::class, 'image']);
-    Route::post('qr/check', [QR::class, 'check']);
-    Route::post('qr/store', [QR::class, 'store'])->name('qr-store');
-    Route::patch('qr/update', [QR::class, 'update'])->name('qr-update');
-});
-//Print
-Route::get('print/{id}/', [PrintController::class, 'payslip'])->name('print');
-Route::get('print/payroll/{id}/', [PrintController::class, 'payroll'])->name('p-payroll');
 
-//Route::get('print',[PrintController::class,'index'])->name('print');
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
 
 require __DIR__ . '/auth.php';

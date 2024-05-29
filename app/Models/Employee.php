@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -12,12 +11,11 @@ class Employee extends Model
 {
     use HasFactory;
     protected $fillable = [ 
-        'userName',
+        'user_name',
         'role',
-        'first',
-        'middle',
-        'last',
-        'name',
+        'first_name',
+        'middle_name',
+        'last_name',
         'email',
         'phone',
         'status',
@@ -28,17 +26,15 @@ class Employee extends Model
         'eName',
         'ePhone',
         'eAdd',
-        'created_by',
-        'edited_by',
         'eStatus',
     ];
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);    
-    }
     public function image(): HasOne
     {
         return $this->hasOne(Image::class);    
+    }
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class);    
     }
     public function payroll(): HasMany
     {
@@ -46,6 +42,6 @@ class Employee extends Model
     }
     public function qr(): HasMany
     {
-        return $this->hasMany(QRLogin::class);    
+        return $this->hasMany(QR::class);    
     }
 }
