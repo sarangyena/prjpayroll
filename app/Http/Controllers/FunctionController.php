@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Image;
+use App\Models\Log;
 use App\Models\Payroll;
+use App\Models\QR;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -12,6 +14,34 @@ use Illuminate\Support\Facades\Session;
 
 class FunctionController extends Controller
 {
+    private $current;
+    private $firstDay;
+    private $lastDay;
+    private $weekId;
+    private $monthId;
+    private $yearId;
+    private $admin;
+    private $log;
+
+    public function __construct()
+    {
+        //Dates
+        $this->current = Carbon::today();
+        $firstDay = $this->current->copy()->startOfWeek();
+        $this->firstDay = $firstDay->format('F j, Y');
+        $this->lastDay = $this->current->format('F j, Y');
+        $this->weekId = $this->current->week();
+        $this->monthId = $this->current->month;
+        $this->yearId = $this->current->year;
+        //Admin
+        $this->admin = auth()->user();
+        //Log
+        if ($this->admin->user_name == 'ADMIN') {
+            $this->log = Log::where('user_id', $this->admin->id)
+                ->whereDate('created_at', $this->current)
+                ->get();
+        }
+    }
     public function username(Request $request)
     {
         $data = $request->input('role');
@@ -192,13 +222,13 @@ class FunctionController extends Controller
     {
         $month = Carbon::parse("1 $request->month");
         $payroll = Payroll::where('month_id', $month->month)->get();
-        if(count($payroll) >= 1){
+        if (count($payroll) >= 1) {
             $net = 0;
-            foreach($payroll as $p){
+            foreach ($payroll as $p) {
                 $net += $p->net;
             }
             return $net;
-        }else{
+        } else {
             return $net = 0;
         }
     }
@@ -206,13 +236,41 @@ class FunctionController extends Controller
     {
         $year = (int)$request->year;
         $payroll = Payroll::where('year_id', $year)->get();
-        if(count($payroll) >= 1){
+        if (count($payroll) >= 1) {
             $net = 0;
-            foreach($payroll as $p){
+            foreach ($payroll as $p) {
                 $net += $p->net;
             }
             return $net;
-        }else{
+        } else {
+            return $net = 0;
+        }
+    }
+    public function empMonth(Request $request)
+    {
+        $month = Carbon::parse("1 $request->month");
+        $payroll = Payroll::where('user_name', auth()->user()->user_name)->where('month_id', $month->month)->get();
+        if (count($payroll) >= 1) {
+            $net = 0;
+            foreach ($payroll as $p) {
+                $net += $p->net;
+            }
+            return $net;
+        } else {
+            return $net = 0;
+        }
+    }
+    public function empYear(Request $request)
+    {
+        $year = (int)$request->year;
+        $payroll = Payroll::where('user_name', auth()->user()->user_name)->where('year_id', $year)->get();
+        if (count($payroll) >= 1) {
+            $net = 0;
+            foreach ($payroll as $p) {
+                $net += $p->net;
+            }
+            return $net;
+        } else {
             return $net = 0;
         }
     }

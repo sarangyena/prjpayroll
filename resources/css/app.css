@@ -1,3 +1,21 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #4ade80 white;
+    }
+/* Works on Chrome, Edge, and Safari */
+    *::-webkit-scrollbar {
+    width: 12px;
+    }
+    
+    *::-webkit-scrollbar-track {
+        background: white;
+    }
+    
+    *::-webkit-scrollbar-thumb {
+        background-color: #4ade80;
+        border-radius: 20px;
+        border: 3px solid white;
+    }

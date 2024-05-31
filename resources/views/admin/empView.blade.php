@@ -55,6 +55,9 @@
                                         <th scope="col" class="px-4 py-2">
                                             Action
                                         </th>
+                                        <th scope="col" class="px-4 py-2 hide" hidden>
+                                            Date Hired
+                                        </th>
                                         <th scope="col" class="px-4 py-2">
                                             Username
                                         </th>
@@ -139,6 +142,9 @@
                                                             d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" />
                                                     </svg>
                                                 </a>
+                                            </td>
+                                            <td class="px-4 py-3 hide" hidden>
+                                                {{ Carbon\Carbon::parse($d->created_at)->format('F j, Y, g:i A') }}
                                             </td>
                                             <td class="px-4 py-3">
                                                 {{ $d->user_name }}

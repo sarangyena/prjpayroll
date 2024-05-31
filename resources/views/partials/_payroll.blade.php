@@ -37,9 +37,11 @@
                 <th scope="col" class="px-4 py-2">
                     ID
                 </th>
-                <th scope="col" class="px-4 py-2">
-                    Action
-                </th>
+                @if (Route::currentRouteName() != 'u-payroll')
+                    <th scope="col" class="px-4 py-2">
+                        Action
+                    </th>
+                @endif
                 <th scope="col" class="px-4 py-2">
                     Pay ID
                 </th>
@@ -137,7 +139,7 @@
                         {{ $d->job }}
                     </td>
                     <td class="px-4 py-3 hide" hidden>
-                        {{ $d->rate }}
+                        ₱ {{ $d->rate }}
                     </td>
                     <td class="px-4 py-3 hide" hidden>
                         {{ $d->days }}
@@ -146,37 +148,37 @@
                         {{ $d->late }}
                     </td>
                     <td class="px-4 py-3 hide" hidden>
-                        {{ $d->salary }}
+                        ₱ {{ $d->salary }}
                     </td>
                     <td class="px-4 py-3 hide" hidden>
-                        {{ $d->rph }}
+                        ₱ {{ $d->rph }}
                     </td>
                     <td class="px-4 py-3 hide" hidden>
                         {{ $d->hrs }}
                     </td>
                     <td class="px-4 py-3 hide" hidden>
-                        {{ $d->otpay }}
+                        ₱ {{ $d->otpay }}
                     </td>
                     <td class="px-4 py-3 hide" hidden>
-                        {{ $d->holiday }}
+                        ₱ {{ $d->holiday }}
                     </td>
                     <td class="px-4 py-3 hide" hidden>
-                        {{ $d->sss }}
+                        ₱ {{ $d->sss }}
                     </td>
                     <td class="px-4 py-3 hide" hidden>
-                        {{ $d->philhealth }}
+                        ₱ {{ $d->philhealth }}
                     </td>
                     <td class="px-4 py-3 hide" hidden>
-                        {{ $d->advance }}
+                        ₱ {{ $d->advance }}
                     </td>
                     <td class="px-4 py-3">
-                        {{ $d->gross }}
+                        ₱ {{ $d->gross }}
                     </td>
                     <td class="px-4 py-3">
-                        {{ $d->deduction }}
+                        ₱ {{ $d->deduction }}
                     </td>
                     <td class="px-4 py-3">
-                        {{ $d->net }}
+                        ₱ {{ $d->net }}
                     </td>
                 </tr>
             @endforeach

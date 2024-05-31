@@ -7,9 +7,8 @@ use App\Http\Controllers\QRController;
 use App\Http\Controllers\ViewController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('auth.login');
-});
+Route::get('/', [ViewController::class, 'index'])->name('index');
+
 
 Route::middleware(['role:QR'])->group(function () {
     Route::get('/scanner', [ViewController::class, 'qrScanner'])->name('qr-scanner');
@@ -18,15 +17,13 @@ Route::middleware(['role:QR'])->group(function () {
     Route::post('qr/image', [QRController::class, 'image']);
     Route::post('qr/store', [QRController::class, 'store']);
     Route::get('/session', [FunctionController::class, 'qrSession']);
-
-
-
-    
-
 });
 Route::middleware(['role:USER'])->group(function () {
     Route::get('user/dashboard', [ViewController::class, 'userDash'])->name('u-dashboard');
     Route::get('user/payroll', [ViewController::class, 'empPay'])->name('u-payroll');
+
+    Route::post('user/empMonth', [FunctionController::class, 'empMonth']);
+    Route::post('user/empYear', [FunctionController::class, 'empYear']);
 });
 
 Route::middleware(['role:ADMIN'])->group(function () {
@@ -54,6 +51,7 @@ Route::middleware(['role:ADMIN'])->group(function () {
     Route::post('{id}/username', [FunctionController::class, 'username']);
     Route::post('month', [FunctionController::class, 'month']);
     Route::post('year', [FunctionController::class, 'year']);
+
 
 
 });
