@@ -36,7 +36,7 @@ class ViewController extends Controller
         //Admin
         $this->admin = auth()->user();
         //Log
-        if ($this->admin != null) {
+        if($this->admin != null){
             $this->log = Log::where('user_id', $this->admin->id)
                 ->whereDate('created_at', $this->current)
                 ->get();

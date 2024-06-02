@@ -12,7 +12,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    @if (auth()->user()->user_type == 'QR')
+        <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>

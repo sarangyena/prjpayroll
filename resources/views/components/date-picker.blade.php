@@ -1,4 +1,4 @@
-<form class="flex items-center max-w-sm m-2">
+<form class="flex items-center max-w-sm mx-2">
     <div class="relative w-full" id="d">
         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"

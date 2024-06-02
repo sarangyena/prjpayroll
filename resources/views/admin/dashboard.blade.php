@@ -4,7 +4,6 @@
             {{ __('Dashboard') }}
         </h2>
     </x-slot>
-
     <div class="py-7">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -59,15 +58,13 @@
         </div>
     </div>
     @include('partials._log')
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
         integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="application/javascript">
             $(document).ready(function() {
-                $('#drawer-example').click(function(){
-                    console.log('success');
-                })
                 $('#month').change(function() {
                     const data = {
                         month: $(this).val()

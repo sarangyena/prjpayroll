@@ -1,6 +1,4 @@
 <x-app-layout>
-    @include('partials._log')
-
     <div class="py-8">
         <div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -8,7 +6,15 @@
                     <p class="font-bold text-2xl border-b-2 border-green-300">QR RECORDS</p>
                     @if ($data->isEmpty())
                         <div class="flex justify-between">
-                            <x-date-picker />
+                            <div class="flex mt-2">
+                                <select id="dateType"
+                                    class="self-center w-1/2 p-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option selected value="date">By Specific Date:</option>
+                                    <option value="range">Ranged Date:</option>
+                                </select>
+                                <x-date-picker />
+                                <x-date-range />
+                            </div>
                             <a href="{{ route('a-qrView') }}" class="self-center">
                                 <button type="button"
                                     class="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1 text-center me-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800"><svg
@@ -20,7 +26,6 @@
                                 </button>
                             </a>
                         </div>
-
                         <x-info-alert />
                     @else
                         <div class="flex justify-between">
@@ -127,7 +132,9 @@
             </div>
         </div>
     </div>
+    @include('partials._log')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script type="application/javascript">
@@ -149,10 +156,12 @@
                         window.location.href = '/qrView?range=' + encodeURIComponent(JSON.stringify(data));
                     }
                 }else if($('#dateType').val() == 'date'){
-                    var date = $('#date').val();
-                    window.location.href = '/qrView?date=' + encodeURIComponent(date);
+                    if($('#date').val() != ''){
+                        var date = $('#date').val();
+                        window.location.href = '/qrView?date=' + encodeURIComponent(date);                    
+                    }
+                    
                 }
-                
             });
             $('#dateType').on('change', function() {
                 var val = $(this).val();
