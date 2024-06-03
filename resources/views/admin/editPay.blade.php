@@ -1,17 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between">
-            <h2 class="self-center font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Edit Payroll') }}
-            </h2>
-        </div>
+        <h2 class="text-center font-semibold text-xl text-gray-800 lg:text-left leading-tight">
+            {{ __('Edit Payroll') }}
+        </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 lg:py-12">
+        <div class="mx-auto lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <p class="font-bold text-2xl border-b-2 border-green-300">EDIT PAYROLL</p>
+                <div class="p-4 text-gray-900">
+                    <p class="font-bold text-2xl border-b-2 border-green-300 text-center lg:text-left">EDIT PAYROLL</p>
                     @if (session('danger'))
                         <x-danger-alert />
                     @endif
@@ -19,26 +17,28 @@
                         enctype="multipart/form-data">
                         @csrf
                         @method('patch')
-                        <div class="columns-4 pt-2">
+                        <div class="columns-2 mt-2">
                             <div>
                                 <x-input-label for="pay_id" :value="__('Payroll ID:')" />
                                 <x-text-input id="pay_id" class="block mt-1 w-full" type="text" name="pay_id"
-                                    readonly placeholder="{{ isset($payroll) ? $payroll->pay_id : null }}" readonly />
+                                    readonly placeholder="{{ isset($payroll) ? $payroll->pay_id : null }}" />
                             </div>
                             <div>
                                 <x-input-label for="user_name" :value="__('User ID:')" />
                                 <x-text-input id="user_name" class="block mt-1 w-full" type="text" name="user_name"
-                                    placeholder="{{ isset($payroll) ? $payroll->user_name : null }}" readonly />
+                                    readonly placeholder="{{ isset($payroll) ? $payroll->user_name : null }}" />
                             </div>
+                        </div>
+                        <div class="columns-2 mt-2">
                             <div>
-                                <x-input-label for="name" :value="__('Name:')" />
+                                <x-input-label for="name" :value="__('Name:')" class="" />
                                 <x-text-input id="name" class="block mt-1 w-full" type="text" name="name"
-                                    readonly placeholder="{{ isset($payroll) ? $payroll->name : null }}" readonly />
+                                    readonly placeholder="{{ isset($payroll) ? $payroll->name : null }}" />
                             </div>
                             <div>
-                                <x-input-label for="job" :value="__('Job:')" />
+                                <x-input-label for="job" :value="__('Job:')" class="" />
                                 <x-text-input id="job" class="block mt-1 w-full" type="text" name="job"
-                                    readonly placeholder="{{ isset($payroll) ? $payroll->job : null }}" readonly />
+                                    readonly placeholder="{{ isset($payroll) ? $payroll->job : null }}" />
                             </div>
                         </div>
                         <div class="border-2 mt-3 border-green-300 rounded-lg p-3">
@@ -66,45 +66,53 @@
                                     readonly />
                             </div>
                         </div>
-                        <div class="columns-3 border-2 border-green-300 p-3 mt-3 rounded-lg">
-                            <div>
-                                <x-input-label for="rph" :value="__('Rate Per Hour:')" />
-                                <x-text-input id="rph" class="block mt-1 w-full ot" type="number" name="rph"
-                                    placeholder="{{ isset($payroll) ? $payroll->rph : null }}" />
+                        <div class="border-2 border-green-300 p-3 mt-3 rounded-lg">
+                            <div class="columns-2 text-nowrap">
+                                <div>
+                                    <x-input-label for="rph" :value="__('Rate Per Hour:')" />
+                                    <x-text-input id="rph" class="block mt-1 w-full ot" type="number"
+                                        name="rph" placeholder="{{ isset($payroll) ? $payroll->rph : null }}" />
+                                </div>
+                                <div>
+                                    <x-input-label for="hrs" :value="__('Hours:')" />
+                                    <x-text-input id="hrs" class="block mt-1 w-full ot" type="number"
+                                        name="hrs" placeholder="{{ isset($payroll) ? $payroll->hrs : null }}" />
+                                </div>
                             </div>
                             <div>
-                                <x-input-label for="hrs" :value="__('Hours:')" />
-                                <x-text-input id="hrs" class="block mt-1 w-full ot" type="number" name="hrs"
-                                    placeholder="{{ isset($payroll) ? $payroll->hrs : null }}" />
-                            </div>
-                            <div>
-                                <x-input-label for="otpay" :value="__('Overtime Pay:')" />
+                                <x-input-label for="otpay" :value="__('Overtime Pay:')" class="mt-2" />
                                 <x-text-input id="otpay" class="block mt-1 w-full total" type="text"
                                     name="otpay" placeholder="{{ isset($payroll) ? $payroll->otpay : null }}"
                                     readonly />
                             </div>
                         </div>
-                        <div class="columns-4 mt-2 border-2 border-green-300 p-3 rounded-lg">
-                            <div>
-                                <x-input-label for="holiday" :value="__('Holiday:')" />
-                                <x-text-input id="holiday" class="block mt-1 w-full total" type="number"
-                                    name="holiday" placeholder="{{ isset($payroll) ? $payroll->holiday : null }}" />
+                        <div class="border-2 border-green-300 p-3 mt-3 rounded-lg">
+                            <div class="columns-2">
+                                <div>
+                                    <x-input-label for="holiday" :value="__('Holiday:')" />
+                                    <x-text-input id="holiday" class="block mt-1 w-full total" type="number"
+                                        name="holiday"
+                                        placeholder="{{ isset($payroll) ? $payroll->holiday : null }}" />
+                                </div>
+                                <div>
+                                    <x-input-label for="philhealth" :value="__('Philhealth:')" />
+                                    <x-text-input id="philhealth" class="block mt-1 w-full deduction" type="number"
+                                        name="philhealth"
+                                        placeholder="{{ isset($payroll) ? $payroll->philhealth : null }}" />
+                                </div>
                             </div>
-                            <div>
-                                <x-input-label for="philhealth" :value="__('Philhealth:')" />
-                                <x-text-input id="philhealth" class="block mt-1 w-full deduction" type="number"
-                                    name="philhealth"
-                                    placeholder="{{ isset($payroll) ? $payroll->philhealth : null }}" />
-                            </div>
-                            <div>
-                                <x-input-label for="sss" :value="__('SSS:')" />
-                                <x-text-input id="sss" class="block mt-1 w-full deduction" type="number"
-                                    name="sss" placeholder="{{ isset($payroll) ? $payroll->sss : null }}" />
-                            </div>
-                            <div>
-                                <x-input-label for="advance" :value="__('Cash Advance:')" />
-                                <x-text-input id="advance" class="block mt-1 w-full deduction" type="number"
-                                    name="advance" placeholder="{{ isset($payroll) ? $payroll->advance : null }}" />
+                            <div class="columns-2 mt-2">
+                                <div>
+                                    <x-input-label for="sss" :value="__('SSS:')" />
+                                    <x-text-input id="sss" class="block mt-1 w-full deduction" type="number"
+                                        name="sss" placeholder="{{ isset($payroll) ? $payroll->sss : null }}" />
+                                </div>
+                                <div>
+                                    <x-input-label for="advance" :value="__('Cash Advance:')" />
+                                    <x-text-input id="advance" class="block mt-1 w-full deduction" type="number"
+                                        name="advance"
+                                        placeholder="{{ isset($payroll) ? $payroll->advance : null }}" />
+                                </div>
                             </div>
                         </div>
                         <div class="columns-3 mt-2">
@@ -128,15 +136,13 @@
                             </div>
                         </div>
 
-                        <div class="flex mt-2 flex-row-reverse">
-                            <x-primary-button class="m-3">
-                                {{ isset($payroll) ? __('Save') : __('Add') }}
-                            </x-primary-button>
-                            @if (!isset($payroll))
-                                <x-secondary-button id="clear" class="m-3">
-                                    {{ __('Clear') }}
-                                </x-secondary-button>
-                            @endif
+                        <div class="flex justify-between lg:justify-start lg:gap-3 lg:flex-row-reverse">
+                            <button type="submit"
+                                class="w-1/2 focus:outline-none text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 my-3 lg:w-1/4">
+                                {{ __('Save')  }}
+                            </button>
+                            <button type="button" id="clear"
+                                class="text-gray-900 border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center my-3">Clear</button>
                         </div>
                     </form>
                 </div>
@@ -159,11 +165,13 @@
                 num = salary + otpay + holiday;
                 console.log(otpay);
                 (salary === {{ $payroll->salary }} && otpay === {{ $payroll->otpay }} && holiday ===
-                    {{ $payroll->holiday }}) ? $('#gross').val('') : $('#gross').val(num);
+                    {{ $payroll->holiday }}) ? $('#gross').val(''): $('#gross').val(num);
                 var gross = $("#gross").val() == '' ? {{ $payroll->gross }} : Number($("#gross").val());
-                var deduction = $("#deduction").val() == '' ? {{ $payroll->deduction }} : Number($("#deduction").val());
+                var deduction = $("#deduction").val() == '' ? {{ $payroll->deduction }} : Number($("#deduction")
+                    .val());
                 num = gross - deduction;
-                (gross === {{ $payroll->gross }} && deduction === {{ $payroll->deduction }}) ? $('#net').val('') : $('#net').val(num);
+                (gross === {{ $payroll->gross }} && deduction === {{ $payroll->deduction }}) ? $('#net').val(''):
+                    $('#net').val(num);
             }
             $('.salary').on('input', function() {
                 var rate = $("#rate").val() == '' ? {{ $payroll->rate }} : Number($("#rate").val());
@@ -171,22 +179,26 @@
                 var late = $("#late").val() == '' ? {{ $payroll->late }} : Number($("#late").val());
                 num = (rate * days) - (rate / 8 * late);
                 (late === {{ $payroll->late }} && days === {{ $payroll->days }} && rate ===
-                    {{ $payroll->rate }}) ? $('#salary').val('') : $('#salary').val(num);
+                    {{ $payroll->rate }}) ? $('#salary').val(''): $('#salary').val(num);
                 total();
             });
             $('.ot').on('input', function() {
                 var rph = $("#rph").val() == '' ? {{ $payroll->rph }} : Number($("#rph").val());
                 var hrs = $("#hrs").val() == '' ? {{ $payroll->hrs }} : Number($("#hrs").val());
                 num = rph * hrs;
-                (rph === {{ $payroll->rph }} && hrs === {{ $payroll->hrs }}) ? $('#otpay').val('') : $('#otpay').val(num);
+                (rph === {{ $payroll->rph }} && hrs === {{ $payroll->hrs }}) ? $('#otpay').val(''): $(
+                    '#otpay').val(num);
                 total();
             });
             $('.deduction').on('input', function() {
-                var philhealth = $("#philhealth").val() == '' ? {{ $payroll->philhealth }} : Number($("#philhealth").val());
+                var philhealth = $("#philhealth").val() == '' ? {{ $payroll->philhealth }} : Number($(
+                    "#philhealth").val());
                 var sss = $("#sss").val() == '' ? {{ $payroll->sss }} : Number($("#sss").val());
-                var advance = $("#advance").val() == '' ? {{ $payroll->advance }} : Number($("#advance").val());
+                var advance = $("#advance").val() == '' ? {{ $payroll->advance }} : Number($("#advance")
+                    .val());
                 num = philhealth + sss + advance;
-                (philhealth === {{ $payroll->philhealth }} && sss === {{ $payroll->sss }} && advance === {{ $payroll->advance }}) ? $('#deduction').val('') : $('#deduction').val(num);
+                (philhealth === {{ $payroll->philhealth }} && sss === {{ $payroll->sss }} && advance ===
+                    {{ $payroll->advance }}) ? $('#deduction').val(''): $('#deduction').val(num);
                 total();
             });
             $('#holiday').on('input', function() {

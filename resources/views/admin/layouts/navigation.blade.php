@@ -26,6 +26,9 @@
                     <x-nav-link :href="route('a-qrView')" :active="request()->routeIs('a-qrView')">
                         {{ __('QR Record') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('a-logs')" :active="request()->routeIs('a-logs')">
+                        {{ __('Logs') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -52,10 +55,11 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
-                        <x-dropdown-link type="button" data-drawer-target="drawer-example"
+                        <!--
+                        <x-dropdown-link type="button" data-drawer-target="drawer-example" id="drawer"
                             data-drawer-show="drawer-example" aria-controls="drawer-example">
                             {{ __('Log') }}
-                        </x-dropdown-link>
+                        </x-dropdown-link> -->
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -93,13 +97,27 @@
             <x-responsive-nav-link :href="route('a-dashboard')" :active="request()->routeIs('a-dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('a-addEmp')" :active="request()->routeIs('a-addEmp') ||
+                request()->routeIs('a-empView') ||
+                request()->routeIs('a-editEmp')">
+                {{ __('Employee') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('a-payView')" :active="request()->routeIs('a-payView') || request()->routeIs('a-editPay')">
+                {{ __('Payroll') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('a-qrView')" :active="request()->routeIs('a-qrView')">
+                {{ __('QR Records') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('a-logs')" :active="request()->routeIs('a-logs')">
+                {{ __('Logs') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email != null ? Auth::user()->email : "No email displayed." }}</div>
             </div>
 
             <div class="mt-3 space-y-1">

@@ -21,6 +21,8 @@ Route::middleware(['role:QR'])->group(function () {
 Route::middleware(['role:USER'])->group(function () {
     Route::get('user/dashboard', [ViewController::class, 'userDash'])->name('u-dashboard');
     Route::get('user/payroll', [ViewController::class, 'empPay'])->name('u-payroll');
+    Route::get('user/qrView', [ViewController::class, 'empQr'])->name('u-qrView');
+
 
     Route::post('user/empMonth', [FunctionController::class, 'empMonth']);
     Route::post('user/empYear', [FunctionController::class, 'empYear']);
@@ -32,6 +34,7 @@ Route::middleware(['role:ADMIN'])->group(function () {
     Route::get('/empView', [ViewController::class, 'empView'])->name('a-empView');
     Route::get('/payView', [ViewController::class, 'payView'])->name('a-payView');
     Route::get('/qrView', [ViewController::class, 'qrView'])->name('a-qrView');
+    Route::get('/logs', [ViewController::class, 'logs'])->name('a-logs');
     Route::get('/addEmp', [ViewController::class, 'addEmp'])->name('a-addEmp');
     Route::get('/editEmp/{id}', [ViewController::class, 'editEmp'])->name('a-editEmp');
     Route::get('/editPay/{id}', [ViewController::class, 'editPay'])->name('a-editPay');

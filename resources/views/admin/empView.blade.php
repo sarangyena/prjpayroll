@@ -1,22 +1,22 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between">
-            <h2 class="self-center font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="self-center font-semibold text-base text-gray-800 leading-tight">
                 {{ __('Employee Details') }}
             </h2>
             <a href="{{ route('a-addEmp') }}">
                 <button type="button"
-                    class="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center me-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">Add
+                    class="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1 text-center">Add
                     Employee</button>
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <p class="font-bold text-2xl border-b-2 border-green-300">EMPLOYEE DETAILS</p>
+    <div class="py-6 lg:py-12">
+        <div class="mx-auto lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-4 text-gray-900">
+                    <p class="font-bold text-2xl border-b-2 border-green-300 text-center lg:text-left">EMPLOYEE DETAILS</p>
                     @if (session('success'))
                         <x-success-alert />
                     @elseif (session('error'))
@@ -29,7 +29,7 @@
                         <div class="flex justify-between">
                             <x-search />
                             <button type="button" id="hide-column"
-                                class="mt-3 text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1.5 text-center me-2 mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800"><svg
+                                class="my-3 text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-1.5 text-center me-2 mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800"><svg
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6 hide">
                                     <path stroke-linecap="round" stroke-linejoin="round"

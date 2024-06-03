@@ -1,15 +1,20 @@
 <x-app-layout>
-    <div class="py-8">
-        <div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
+    <x-slot name="header">
+        <h2 class="text-center font-semibold text-xl text-gray-800 lg:text-left leading-tight">
+            {{ __('Scan QR') }}
+        </h2>
+    </x-slot>
+    <div class="py-6 lg:py-12">
+        <div class="mx-auto lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <p class="font-bold text-2xl border-b-2 border-green-300">SCAN QR</p>
+                <div class="p-4 text-gray-900">
+                    <p class="font-bold text-2xl border-b-2 border-green-300 text-center lg:text-left">SCAN QR</p>
                     @if (session('success'))
                         <x-success-alert />
                     @elseif (session('danger'))
                         <x-danger-alert />
                     @endif
-                    <div class="mt-3 columns-2">
+                    <div class="">
                         @php
                             $data1 = session()->get('data1');
                             if (!isset($data1)) {
@@ -21,44 +26,49 @@
                                 $data1['image_data'] = '';
                             }
                         @endphp
-                        <div class="flex flex-col">
-                            <div id="reader" class="w-9/12  mx-auto"></div>
-                            <x-text-input id="image" class="block mt-3 w-full uppercase" type="file"
-                                name="image" accept="image/*" />
-                        </div>
+                        <div class="mt-3 lg:columns-2">
+                            <div id="reader" class="w-9/12 mx-auto"></div>
 
-                        <div>
-                            <form method="POST" action="{{ route('qr-store') }}" id="qrForm"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <div>
-                                    <img src="{{ asset('images/user.png') }}" class="w-1/3 mx-auto mt-10" id="imagePreview">
-                                    <div class="columns-2 mt-3">
-                                        <div>
-                                            <x-input-label for="user_name" :value="__('User ID:')" />
-                                            <x-text-input id="user_name" class="block mt-1 w-full uppercase"
-                                                type="text" name="user_name"
-                                                value="{{ old('user_name', $data1['user_name']) }}" readonly />
+                            <div class="border-2 border-green-300 rounded-lg p-3 mt-3">
+                                <form method="POST" action="{{ route('qr-store') }}" id="qrForm"
+                                    enctype="multipart/form-data">
+                                    @csrf
+                                    <div>
+                                        <img src="{{ asset('images/user.png') }}" class="w-1/3 mx-auto"
+                                            id="imagePreview">
+                                        <div class="">
+                                            <div class="columns-2 mt-2">
+                                                <div>
+                                                    <x-input-label for="user_name" :value="__('User ID:')" />
+                                                    <x-text-input id="user_name" class="block mt-1 w-full uppercase"
+                                                        type="text" name="user_name"
+                                                        value="{{ old('user_name', $data1['user_name']) }}" readonly />
+                                                </div>
+                                                <div>
+                                                    <x-input-label for="role" :value="__('Role:')" />
+                                                    <x-text-input id="role" class="block mt-1 w-full uppercase"
+                                                        type="text" name="role"
+                                                        value="{{ old('role', $data1['role']) }}" readonly />
+                                                </div>
+                                            </div>
+                                            <div class="columns-2 mt-2">
+                                                <x-input-label for="job" :value="__('Job:')" />
+                                                <x-text-input id="job" class="block mt-1 w-full uppercase"
+                                                    type="text" name="job"
+                                                    value="{{ old('job', $data1['job']) }}" readonly />
+                                                <x-input-label for="name" :value="__('Name:')" />
+                                                <x-text-input id="name" class="block mt-1 w-full uppercase"
+                                                    type="text" name="name"
+                                                    value="{{ old('name', $data1['name']) }}" readonly />
+                                            </div>
+
                                         </div>
-                                        <div>
-                                            <x-input-label for="role" :value="__('Role:')" />
-                                            <x-text-input id="role" class="block mt-1 w-full uppercase"
-                                                type="text" name="role" value="{{ old('role', $data1['role']) }}"
-                                                readonly />
-                                        </div>
-                                        <div>
-                                            <x-input-label for="job" :value="__('Job:')" />
-                                            <x-text-input id="job" class="block mt-1 w-full uppercase"
-                                                type="text" name="job" value="{{ old('job', $data1['job']) }}"
-                                                readonly />
-                                        </div>
-                                        <x-input-label for="name" :value="__('Name:')" />
-                                        <x-text-input id="name" class="block mt-1 w-full uppercase" type="text"
-                                            name="name" value="{{ old('name', $data1['name']) }}" readonly />
                                     </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
+                        <x-text-input id="image" class="block mt-3 w-full uppercase" type="file"
+                                name="image" accept="image/*" />
                     </div>
                 </div>
             </div>

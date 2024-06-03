@@ -1,5 +1,4 @@
 <x-app-layout>
-    @include('partials._log')
     @include('partials._qrview')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
@@ -21,12 +20,12 @@
                             $('#start').val(),
                             $('#end').val(),
                         ] 
-                        window.location.href = '/qrView?range=' + encodeURIComponent(JSON.stringify(data));
+                        window.location.href = '/user/qrView?range=' + encodeURIComponent(JSON.stringify(data));
                     }
                 }else if($('#dateType').val() == 'date'){
                     if($('#date').val() != ''){
                         var date = $('#date').val();
-                        window.location.href = '/qrView?date=' + encodeURIComponent(date);                    
+                        window.location.href = '/user/qrView?date=' + encodeURIComponent(date);                    
                     }
                     
                 }

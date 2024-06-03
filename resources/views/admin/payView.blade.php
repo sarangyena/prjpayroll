@@ -1,9 +1,14 @@
 <x-app-layout>
-    <div class="py-8">
-        <div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <p class="font-bold text-2xl border-b-2 border-green-300">PAYROLL DETAILS</p>
+    <x-slot name="header">
+        <h2 class="text-center font-semibold text-xl text-gray-800 lg:text-left leading-tight">
+            {{ __('Payroll') }}
+        </h2>
+    </x-slot>
+    <div class="py-6 lg:py-12">
+        <div class="mx-auto lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-4 text-gray-900">
+                    <p class="font-bold text-2xl border-b-2 border-green-300 text-center lg:text-left">PAYROLL DETAILS</p>
                     @if (session('success'))
                         <x-success-alert />
                     @elseif (session('danger'))

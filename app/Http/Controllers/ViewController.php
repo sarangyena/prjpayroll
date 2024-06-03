@@ -200,11 +200,61 @@ class ViewController extends Controller
             ]);
         }
     }
+    public function empQr(Request $request): View
+    {
+        if ($request->input('date')) {
+            $data = $request->input('date');
+            $qr = QR::where('user_name',$this->admin->user_name)->whereDate('created_at', $data)->paginate();
+            return view('user.qrView', [
+                'data' => $qr,
+                'log' => $this->log,
+            ]);
+        } else if($request->input('range')){
+            $data = $request->input('range');
+            $data = json_decode($data, true);
+            $qr = QR::where('user_name',$this->admin->user_name)->whereBetween('created_at', [$data[0], $data[1]])->paginate();
+            return view('user.qrView', [
+                'data' => $qr,
+                'log' => $this->log,
+            ]);
+        }else {
+            $data = QR::where('user_name',$this->admin->user_name)->paginate();
+            return view('user.qrView', [
+                'data' => $data,
+                'log' => $this->log,
+            ]);
+        }
+    }
     public function empPay(): View
     {
         $payroll = Payroll::where('user_name', auth()->user()->user_name)->paginate();
         return view('user.payroll', [
             'data' => $payroll,
         ]);
+    }
+    public function logs(Request $request): View
+    {
+        if ($request->input('date')) {
+            $data = $request->input('date');
+            $qr = Log::whereDate('created_at', $data)->paginate();
+            return view('admin.logs', [
+                'data' => $qr,
+                'log' => $this->log,
+            ]);
+        } else if($request->input('range')){
+            $data = $request->input('range');
+            $data = json_decode($data, true);
+            $qr = Log::whereBetween('created_at', [$data[0], $data[1]])->paginate();
+            return view('uadmin.logs', [
+                'data' => $qr,
+                'log' => $this->log,
+            ]);
+        }else {
+            $data = Log::paginate();
+            return view('admin.logs', [
+                'data' => $data,
+                'log' => $this->log,
+            ]);
+        }
     }
 }

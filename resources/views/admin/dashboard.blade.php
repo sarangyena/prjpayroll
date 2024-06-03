@@ -1,56 +1,58 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="text-center font-semibold text-xl text-gray-800 lg:text-left leading-tight">
             {{ __('Dashboard') }}
         </h2>
     </x-slot>
-    <div class="py-7">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-4 text-gray-900 dark:text-gray-100">
-                    <p class="font-bold text-2xl border-b-2 border-green-300">PAYROLL</p>
-                    <div class="columns-3 mt-3">
-                        <div class="bg-white rounded-lg shadow-lg dark:bg-gray-800">
-                            <div class="flex justify-center gap-3 border-b-2 pb-3 mx-5 border-green-300">
+    <div class="py-6 lg:py-12">
+        <div class="mx-auto lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-4 text-gray-900">
+                    <p class="font-bold text-2xl border-b-2 border-green-300 text-center lg:text-left">PAYROLL</p>
+                    <div class="lg:flex gap-5 text-nowrap">
+                        <div class="bg-white rounded-lg shadow-inner border-2 mt-3 flex-auto">
+                            <div class="border-b-2 border-green-300 flex gap-5 mx-3 py-2">
                                 <p class="text-xl text-center self-center">TOTAL PAYROLL</p>
                                 <select id="month"
-                                    class="block w-1/2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    class="block w-1/2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500">
                                     <option disabled selected>THIS MONTH</option>
                                     @foreach ($data['mNames'] as $m)
                                         <option value="{{ $m }}">{{ $m }}</option>
                                     @endforeach
                                 </select>
                             </div>
-
-                            <p class="text-4xl text-center py-10" id="m">₱ {{ $data['month'] }}</p>
+                            <p class="text-5xl text-center py-5 lg:text-4xl" id="m">₱ {{ $data['month'] }}</p>
                         </div>
-                        <div class="bg-white rounded-lg shadow-lg dark:bg-gray-800">
-                            <div class="flex justify-center gap-3 border-b-2 pb-3 mx-5 border-green-300">
+                        <div class="bg-white rounded-lg shadow-inner border-2 mt-3 flex-auto">
+                            <div class="border-b-2 border-green-300 flex gap-5 mx-3 py-2">
                                 <p class="text-xl text-center self-center">TOTAL PAYROLL</p>
                                 <select id="year"
-                                    class="block w-1/2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    class="block w-1/2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500">
                                     <option disabled selected>THIS YEAR</option>
                                     @foreach ($data['y'] as $y)
                                         <option value="{{ $y }}">{{ $y }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <p class="text-4xl text-center py-10" id="y">₱ {{ $data['year'] }}</p>
+                            <p class="text-5xl text-center py-5 lg:text-4xl" id="y">₱ {{ $data['year'] }}</p>
                         </div>
-                        <div class="bg-white rounded-lg shadow-lg dark:bg-gray-800">
-                            <p class="text-xl text-center border-b-2 pb-1 border-green-300 mx-5">CURRENT PERIOD</p>
-                            <p class="text-4xl text-center py-12">{{ $data['weekId'] }} Period</p>
+                        <div class="bg-white rounded-lg shadow-inner border-2 mt-3 flex-auto">
+                            <p class="text-xl text-center border-b-2 border-green-300 mx-3 py-2 lg:py-3.5">CURRENT PERIOD</p>
+                            <p class="text-5xl text-center py-5 lg:text-4xl">{{ $data['weekId'] }} Period</p>
                         </div>
                     </div>
-                    <p class="font-bold text-2xl border-b-2 border-green-300 mt-5">EMPLOYEES</p>
-                    <div class="columns-2 mt-3">
-                        <div class="bg-white rounded-lg shadow-lg dark:bg-gray-800">
-                            <p class="text-xl text-center border-b-2 border-green-300 mx-5">TOTAL EMPLOYEES</p>
-                            <p class="text-4xl text-center py-10">{{ $data['emp'] }}</p>
-                        </div>
-                        <div class="bg-white rounded-lg shadow-lg dark:bg-gray-800">
-                            <p class="text-xl text-center border-b-2 border-green-300 mx-5">INACTIVE EMPLOYEES</p>
-                            <p class="text-4xl text-center py-10">{{ $data['status'] }}</p>
+
+                    <div class="mt-5">
+                        <p class="font-bold text-2xl border-b-2 border-green-300 text-center lg:text-left">EMPLOYEES</p>
+                        <div class="lg:flex gap-5">
+                            <div class="bg-white rounded-lg shadow-inner border-2 mt-3 flex-auto">
+                                <p class="text-xl text-center border-b-2 border-green-300 mx-3 py-2 lg:py-3.5">TOTAL EMPLOYEES</p>
+                                <p class="text-5xl text-center py-5 lg:text-4xl">{{ $data['emp'] }}</p>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-inner border-2 mt-3 flex-auto">
+                                <p class="text-xl text-center border-b-2 border-green-300 mx-3 py-2 lg:py-3.5">INACTIVE EMPLOYEES</p>
+                                <p class="text-5xl text-center py-5 lg:text-4xl">{{ $data['status'] }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -65,6 +67,9 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="application/javascript">
             $(document).ready(function() {
+                $('#drawer').click(function(){
+                    console.log('<?php echo $log ?>')
+                })
                 $('#month').change(function() {
                     const data = {
                         month: $(this).val()

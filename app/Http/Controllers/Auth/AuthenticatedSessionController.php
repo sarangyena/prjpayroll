@@ -49,12 +49,15 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $user = User::where('user_name', auth()->user()->user_name)->first();
-        $log = new Log();
-        $log->title = 'LOG OUT';
-        $log->log = 'Admin '.auth()->user()->user_name.' logout at '.Carbon::now();
-        $log->user()->associate($user);
-        $log->save();
+        if(auth()->user()->user_type == 'ADMIN'){
+            $user = User::where('user_name', auth()->user()->user_name)->first();
+            $log = new Log();
+            $log->title = 'LOG OUT';
+            $log->log = 'Admin '.auth()->user()->user_name.' logout at '.Carbon::now();
+            $log->user()->associate($user);
+            $log->save();
+        }
+        
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

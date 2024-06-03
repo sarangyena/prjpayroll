@@ -18,6 +18,7 @@
                 </svg>
                 <span class="sr-only">Close menu</span>
             </button>
+            
             <ol class="relative border-s border-gray-200 dark:border-gray-700">
                 @if (empty($log))
                     <x-info-alert />
