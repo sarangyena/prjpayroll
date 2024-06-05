@@ -49,7 +49,7 @@
     <table>
         <tr>
             <th>Date Of Joining</th>
-            <td>: {{$payroll->created_at}}</td>
+            <td>: {{$payroll->hired}}</td>
             <th>Employee Name</th>
             <td>: {{$payroll->name}}</td>
         </tr>
@@ -62,8 +62,8 @@
         <tr>
             <th>Week Period</th>
             <td>: {{$payroll->week_id}}</td>
-            <th></th>
-            <td></td>
+            <th>Pay Period</th>
+            <td>: {{$payroll->pay_period}}</td>
         </tr>
     </table>
     <h3>PAYSLIP REPORT</h3>

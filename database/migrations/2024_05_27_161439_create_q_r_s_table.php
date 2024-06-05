@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('qr_codes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('employee_id')->constrained()->cascadeOnDelete();
-            $table->string('week_id')->nullable();
-            $table->string('user_name')->nullable();
-            $table->string('name')->nullable();
-            $table->string('role')->nullable();
-            $table->string('job')->nullable();
-            $table->string('timezone')->nullable();
-            $table->string('ip')->nullable();
-            $table->string('geo')->nullable();
+            $table->string('week_id');
+            $table->string('user_name');
+            $table->string('name');
+            $table->string('role');
+            $table->string('job');
+            $table->string('timezone');
+            $table->string('ip');
+            $table->string('geo');
             $table->timestamps();
         });
     }

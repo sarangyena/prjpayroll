@@ -5,7 +5,11 @@ use App\Http\Controllers\FunctionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QRController;
 use App\Http\Controllers\ViewController;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 Route::get('/', [ViewController::class, 'index'])->name('index');
 
@@ -23,7 +27,6 @@ Route::middleware(['role:USER'])->group(function () {
     Route::get('user/payroll', [ViewController::class, 'empPay'])->name('u-payroll');
     Route::get('user/qrView', [ViewController::class, 'empQr'])->name('u-qrView');
 
-
     Route::post('user/empMonth', [FunctionController::class, 'empMonth']);
     Route::post('user/empYear', [FunctionController::class, 'empYear']);
 });
@@ -33,12 +36,13 @@ Route::middleware(['role:ADMIN'])->group(function () {
     Route::get('/dashboard', [ViewController::class, 'adminDash'])->name('a-dashboard');
     Route::get('/empView', [ViewController::class, 'empView'])->name('a-empView');
     Route::get('/payView', [ViewController::class, 'payView'])->name('a-payView');
+    Route::get('/payslip', [ViewController::class, 'payslip'])->name('a-payslip');
+    Route::get('/payroll', [ViewController::class, 'payroll'])->name('a-payroll');
     Route::get('/qrView', [ViewController::class, 'qrView'])->name('a-qrView');
     Route::get('/logs', [ViewController::class, 'logs'])->name('a-logs');
     Route::get('/addEmp', [ViewController::class, 'addEmp'])->name('a-addEmp');
     Route::get('/editEmp/{id}', [ViewController::class, 'editEmp'])->name('a-editEmp');
     Route::get('/editPay/{id}', [ViewController::class, 'editPay'])->name('a-editPay');
-
 
     //Process
     Route::post('/addEmp', [AdminController::class, 'addEmp'])->name('a-addEmp');
@@ -46,7 +50,7 @@ Route::middleware(['role:ADMIN'])->group(function () {
     Route::delete('/deleteEmp/{id}', [AdminController::class, 'deleteEmp'])->name('a-deleteEmp');
     Route::patch('/updatePay/{id}', [AdminController::class, 'updatePay'])->name('a-updatePay');
     Route::get('/payslip/{id}/', [AdminController::class, 'payslip'])->name('p-payslip');
-    Route::get('/payroll/{id}/', [AdminController::class, 'payroll'])->name('p-payroll');
+    Route::get('/p-payroll', [AdminController::class, 'payroll'])->name('p-payroll');
 
     //Functions
     Route::get('/qr/{id}', [FunctionController::class, 'QR'])->name('a-qr');
@@ -54,12 +58,9 @@ Route::middleware(['role:ADMIN'])->group(function () {
     Route::post('{id}/username', [FunctionController::class, 'username']);
     Route::post('month', [FunctionController::class, 'month']);
     Route::post('year', [FunctionController::class, 'year']);
-
-
-
+    Route::post('/payslip', [FunctionController::class, 'payslip'])->name('a-payslip');
+    Route::post('/payroll', [FunctionController::class, 'payroll'])->name('a-payroll');
 });
-
-
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

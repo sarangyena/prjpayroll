@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Http\Controllers\FunctionController;
 use App\Models\Employee;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,12 +19,11 @@ class EmployeeFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition(): array
-    {
+    {   
+        $role = 'EMPLOYEE';
         return [
-            'user_name' => $this->faker->userName(),
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
-            'role' => $this->faker->randomElement(['EMPLOYEE', 'ON-CALL']),
             'email' => $this->faker->unique()->safeEmail,
             'phone' => $this->faker->phoneNumber,
             'sss' => $this->faker->randomNumber(),

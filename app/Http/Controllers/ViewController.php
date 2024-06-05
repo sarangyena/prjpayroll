@@ -7,10 +7,11 @@ use App\Models\Image;
 use App\Models\Log;
 use App\Models\Payroll;
 use App\Models\QR;
+use App\Models\Payslip;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class ViewController extends Controller
 {
@@ -36,14 +37,16 @@ class ViewController extends Controller
         //Admin
         $this->admin = auth()->user();
         //Log
-        if($this->admin != null){
+        if ($this->admin != null) {
             $this->log = Log::where('user_id', $this->admin->id)
                 ->whereDate('created_at', $this->current)
                 ->get();
         }
     }
+
     public function index(): View
     {
+        Cache::forget('data');
         $temp = Employee::all();
         foreach ($temp as $t) {
             $qr = QR::where('user_name', $t->user_name)->latest()->first();
@@ -62,6 +65,7 @@ class ViewController extends Controller
     }
     public function adminDash(): View
     {
+        Cache::forget('data');
         $data = [];
         $data['emp'] = Employee::count();
         $temp = Payroll::where('month_id', $this->monthId)->get();
@@ -99,6 +103,7 @@ class ViewController extends Controller
     }
     public function userDash(): View
     {
+        Cache::forget('data');
         $data = [];
         $temp = Payroll::where('user_name', auth()->user()->user_name)->where('month_id', $this->monthId)->get();
         $data['month'] = 0;
@@ -133,16 +138,19 @@ class ViewController extends Controller
     }
     public function qrScanner(): View
     {
+        Cache::forget('data');
         return view('qr.scanner');
     }
     public function addEmp(): View
     {
+        Cache::forget('data');
         return view('admin.addEmp', [
             'log' => $this->log,
         ]);
     }
     public function editEmp($id): View
     {
+        Cache::forget('data');
         $employee = Employee::find($id);
         $image = Image::where('employee_id', $id)->first();
         return view('admin.editEmp', [
@@ -153,7 +161,8 @@ class ViewController extends Controller
     }
     public function editPay($id): View
     {
-        $payroll = Payroll::find($id);
+        Cache::forget('data');
+        $payroll = Payslip::find($id);
         return view('admin.editPay', [
             'payroll' => $payroll,
             'log' => $this->log,
@@ -161,22 +170,33 @@ class ViewController extends Controller
     }
     public function empView(): View
     {
+        Cache::forget('data');
         $data = Employee::paginate();
         return view('admin.empView', [
             'data' => $data,
             'log' => $this->log,
         ]);
     }
-    public function payView(): View
+    public function payView(Request $request): View
     {
+        Cache::forget('data');
         $data = Payroll::paginate();
         return view('admin.payView', [
             'data' => $data,
             'log' => $this->log,
         ]);
     }
+    public function payroll(Request $request): View
+    {
+        $data = null;
+        return view('admin.generate', [
+            'data' => $data,
+        ]);
+    }
+
     public function qrView(Request $request): View
     {
+        Cache::forget('data');
         if ($request->input('date')) {
             $data = $request->input('date');
             $qr = QR::whereDate('created_at', $data)->paginate();
@@ -184,7 +204,7 @@ class ViewController extends Controller
                 'data' => $qr,
                 'log' => $this->log,
             ]);
-        } else if($request->input('range')){
+        } else if ($request->input('range')) {
             $data = $request->input('range');
             $data = json_decode($data, true);
             $qr = QR::whereBetween('created_at', [$data[0], $data[1]])->paginate();
@@ -192,7 +212,7 @@ class ViewController extends Controller
                 'data' => $qr,
                 'log' => $this->log,
             ]);
-        }else {
+        } else {
             $data = QR::paginate();
             return view('admin.qrView', [
                 'data' => $data,
@@ -202,23 +222,24 @@ class ViewController extends Controller
     }
     public function empQr(Request $request): View
     {
+        Cache::forget('data');
         if ($request->input('date')) {
             $data = $request->input('date');
-            $qr = QR::where('user_name',$this->admin->user_name)->whereDate('created_at', $data)->paginate();
+            $qr = QR::where('user_name', $this->admin->user_name)->whereDate('created_at', $data)->paginate();
             return view('user.qrView', [
                 'data' => $qr,
                 'log' => $this->log,
             ]);
-        } else if($request->input('range')){
+        } else if ($request->input('range')) {
             $data = $request->input('range');
             $data = json_decode($data, true);
-            $qr = QR::where('user_name',$this->admin->user_name)->whereBetween('created_at', [$data[0], $data[1]])->paginate();
+            $qr = QR::where('user_name', $this->admin->user_name)->whereBetween('created_at', [$data[0], $data[1]])->paginate();
             return view('user.qrView', [
                 'data' => $qr,
                 'log' => $this->log,
             ]);
-        }else {
-            $data = QR::where('user_name',$this->admin->user_name)->paginate();
+        } else {
+            $data = QR::where('user_name', $this->admin->user_name)->paginate();
             return view('user.qrView', [
                 'data' => $data,
                 'log' => $this->log,
@@ -227,6 +248,7 @@ class ViewController extends Controller
     }
     public function empPay(): View
     {
+        Cache::forget('data');
         $payroll = Payroll::where('user_name', auth()->user()->user_name)->paginate();
         return view('user.payroll', [
             'data' => $payroll,
@@ -234,6 +256,7 @@ class ViewController extends Controller
     }
     public function logs(Request $request): View
     {
+        Cache::forget('data');
         if ($request->input('date')) {
             $data = $request->input('date');
             $qr = Log::whereDate('created_at', $data)->paginate();
@@ -241,7 +264,7 @@ class ViewController extends Controller
                 'data' => $qr,
                 'log' => $this->log,
             ]);
-        } else if($request->input('range')){
+        } else if ($request->input('range')) {
             $data = $request->input('range');
             $data = json_decode($data, true);
             $qr = Log::whereBetween('created_at', [$data[0], $data[1]])->paginate();
@@ -249,12 +272,38 @@ class ViewController extends Controller
                 'data' => $qr,
                 'log' => $this->log,
             ]);
-        }else {
+        } else {
             $data = Log::paginate();
             return view('admin.logs', [
                 'data' => $data,
                 'log' => $this->log,
             ]);
         }
+    }
+    
+    public function payslip(Request $request): View
+    {
+        Cache::forget('data');
+        $today = Carbon::now();
+        $weekStart = $today->startOfWeek(Carbon::SATURDAY);
+        $weeks = range(1, $weekStart->weekOfYear);
+        if ($request->input('data')) {
+            $data = $request->input('data');
+            $data = json_decode($data, true);
+            $payslip = Payslip::where('week_id', $data)->paginate();
+            return view('admin.payslip',[
+                'weeks'=>$weeks,
+                'data'=>$payslip,
+                'week'=>$data,
+            ]);
+        }else{
+            $payslip = Payslip::where('week_id', $weekStart->weekOfYear)->paginate();
+            return view('admin.payslip',[
+                'weeks'=>$weeks,
+                'data'=>$payslip,
+            ]);
+        }
+
+        
     }
 }

@@ -76,6 +76,9 @@
                                         <th scope="col" class="px-4 py-2">
                                             Job
                                         </th>
+                                        <th scope="col" class="px-4 py-2">
+                                            Rate
+                                        </th>
                                         <th scope="col" class="px-4 py-2 hide" hidden>
                                             SSS
                                         </th>
@@ -164,6 +167,9 @@
                                             <td class="px-4 py-3">
                                                 {{ $d->job }}
                                             </td>
+                                            <td class="px-4 py-3">
+                                                {{ $d->rate }}
+                                            </td>
                                             <td class="px-4 py-3 hide" hidden>
                                                 {{ $d->sss }}
                                             </td>
@@ -195,7 +201,6 @@
             </div>
         </div>
     </div>
-    @include('partials._log')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>

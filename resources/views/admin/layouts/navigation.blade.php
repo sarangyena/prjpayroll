@@ -15,13 +15,16 @@
                     <x-nav-link :href="route('a-dashboard')" :active="request()->routeIs('a-dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('a-addEmp')" :active="request()->routeIs('a-addEmp') ||
+                    <x-nav-link :href="route('a-empView')" :active="request()->routeIs('a-addEmp') ||
                         request()->routeIs('a-empView') ||
                         request()->routeIs('a-editEmp')">
                         {{ __('Employee') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('a-payView')" :active="request()->routeIs('a-payView') || request()->routeIs('a-editPay')">
+                    <x-nav-link :href="route('a-payroll')" :active="request()->routeIs('a-payView') || request()->routeIs('a-editPay') || request()->routeIs('a-payroll')">
                         {{ __('Payroll') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('a-payslip')" :active="request()->routeIs('a-payslip')">
+                        {{ __('Payslip') }}
                     </x-nav-link>
                     <x-nav-link :href="route('a-qrView')" :active="request()->routeIs('a-qrView')">
                         {{ __('QR Record') }}
@@ -74,7 +77,6 @@
                     </x-slot>
                 </x-dropdown>
             </div>
-            @include('partials._log')
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open"

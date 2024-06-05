@@ -67,8 +67,8 @@
                                 </form>
                             </div>
                         </div>
-                        <x-text-input id="image" class="block mt-3 w-full uppercase" type="file"
-                                name="image" accept="image/*" />
+                        <x-text-input id="image" class="block mt-3 w-full uppercase" type="file" name="image"
+                            accept="image/*" />
                     </div>
                 </div>
             </div>
@@ -102,44 +102,35 @@
                         Promise.all(request)
                             .then((responses) => {
                                 const data1 = responses[0].data;
-                                $('#user_name').val(data1.user_name);
-                                $('#role').val(data1.role);
-                                $('#job').val(data1.job);
-                                $('#name').val(data1.name);
-
+                                if(data1.error != "undefined"){
+                                    $('#user_name').val(data1.user_name);
+                                    $('#role').val(data1.role);
+                                    $('#job').val(data1.job);
+                                    $('#name').val(data1.name);
+                                }
                                 const blobData = responses[1].data;
-                                const blobUrl = URL.createObjectURL(blobData);
-                                $('#imagePreview').attr('src', blobUrl);
+                                if(blobData.type != 'application/json'){
+                                    const blobUrl = URL.createObjectURL(blobData);
+                                    $('#imagePreview').attr('src', blobUrl);
+                                }
 
                                 const data2 = responses[2].data;
+                                var dataObject = {
+                                    user_name: $('#user_name').val(),
+                                    role: $('#role').val(),
+                                    job: $('#job').val(),
+                                    name: $('#name').val(),
+                                }
                                 if(data2.add == true){
-                                    var dataObject = {
-                                        user_name: $('#user_name').val(),
-                                        role: $('#role').val(),
-                                        job: $('#job').val(),
-                                        name: $('#name').val(),
-                                        message: 'Successfully added record.',
-                                    }
+                                    dataObject.message = "Successfully added record.";
                                     var jsonData = JSON.stringify(dataObject);
                                     window.location.href = '/session?object=' + encodeURIComponent(jsonData);
                                 }else if(data2.update == true){
-                                    var dataObject = {
-                                        user_name: $('#user_name').val(),
-                                        role: $('#role').val(),
-                                        job: $('#job').val(),
-                                        name: $('#name').val(),
-                                        message: 'Successfully updated record.',
-                                    }
+                                    dataObject.message = "Successfully updated record.";
                                     var jsonData = JSON.stringify(dataObject);
                                     window.location.href = '/session?object=' + encodeURIComponent(jsonData);
                                 }else if(data2.error == true){
-                                    var dataObject = {
-                                        user_name: $('#user_name').val(),
-                                        role: $('#role').val(),
-                                        job: $('#job').val(),
-                                        name: $('#name').val(),
-                                        message: 'Employee does not exist.',
-                                    }
+                                    dataObject.message = "Employee does not exist.";
                                     var jsonData = JSON.stringify(dataObject);
                                     window.location.href = '/session?error=' + encodeURIComponent(jsonData);
                                 }
@@ -175,44 +166,35 @@
                             Promise.all(request)
                                 .then((responses) => {
                                     const data1 = responses[0].data;
-                                    $('#user_name').val(data1.user_name);
-                                    $('#role').val(data1.role);
-                                    $('#job').val(data1.job);
-                                    $('#name').val(data1.name);
-
+                                    if(data1.error != "undefined"){
+                                        $('#user_name').val(data1.user_name);
+                                        $('#role').val(data1.role);
+                                        $('#job').val(data1.job);
+                                        $('#name').val(data1.name);
+                                    }
                                     const blobData = responses[1].data;
-                                    const blobUrl = URL.createObjectURL(blobData);
-                                    $('#imagePreview').attr('src', blobUrl);
+                                    if(blobData.type != 'application/json'){
+                                        const blobUrl = URL.createObjectURL(blobData);
+                                        $('#imagePreview').attr('src', blobUrl);
+                                    }
 
                                     const data2 = responses[2].data;
+                                    var dataObject = {
+                                        user_name: $('#user_name').val(),
+                                        role: $('#role').val(),
+                                        job: $('#job').val(),
+                                        name: $('#name').val(),
+                                    }
                                     if(data2.add == true){
-                                        var dataObject = {
-                                            user_name: $('#user_name').val(),
-                                            role: $('#role').val(),
-                                            job: $('#job').val(),
-                                            name: $('#name').val(),
-                                            message: 'Successfully added record.',
-                                        }
+                                        dataObject.message = "Successfully added record.";
                                         var jsonData = JSON.stringify(dataObject);
                                         window.location.href = '/session?object=' + encodeURIComponent(jsonData);
                                     }else if(data2.update == true){
-                                        var dataObject = {
-                                            user_name: $('#user_name').val(),
-                                            role: $('#role').val(),
-                                            job: $('#job').val(),
-                                            name: $('#name').val(),
-                                            message: 'Successfully updated record.',
-                                        }
+                                        dataObject.message = "Successfully updated record.";
                                         var jsonData = JSON.stringify(dataObject);
                                         window.location.href = '/session?object=' + encodeURIComponent(jsonData);
                                     }else if(data2.error == true){
-                                        var dataObject = {
-                                            user_name: $('#user_name').val(),
-                                            role: $('#role').val(),
-                                            job: $('#job').val(),
-                                            name: $('#name').val(),
-                                            message: 'Employee does not exist.',
-                                        }
+                                        dataObject.message = "Employee does not exist.";
                                         var jsonData = JSON.stringify(dataObject);
                                         window.location.href = '/session?error=' + encodeURIComponent(jsonData);
                                     }

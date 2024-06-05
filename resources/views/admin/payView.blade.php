@@ -1,8 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-center font-semibold text-xl text-gray-800 lg:text-left leading-tight">
-            {{ __('Payroll') }}
-        </h2>
+        <div class="flex justify-between">
+            <h2 class="self-center font-semibold text-base text-gray-800 leading-tight lg:text-xl">
+                {{ __('Payroll') }}
+            </h2>
+            <a href="{{route('a-generate')}}">
+                <button type="button"
+                    class="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1 text-center lg:px-5 lg:py-2.5">Generate Payroll</button>
+            </a>
+        </div>
     </x-slot>
     <div class="py-6 lg:py-12">
         <div class="mx-auto lg:px-8">

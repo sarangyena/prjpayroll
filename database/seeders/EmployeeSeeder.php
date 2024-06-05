@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Http\Controllers\FunctionController;
 use App\Models\Employee;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,8 +14,10 @@ class EmployeeSeeder extends Seeder
      */
     public function run(): void
     {
-        Employee::factory()->count(25)->state([
-            'eStatus' => 'ACTIVE'
+        $role = 'EMPLOYEE';
+        Employee::factory()->state([
+            'user_name'=>FunctionController::username2($role),
+            'eStatus' => 'ACTIVE',
         ])->create();
     }
 }

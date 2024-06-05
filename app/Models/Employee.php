@@ -19,6 +19,7 @@ class Employee extends Model
         'email',
         'phone',
         'status',
+        'rate',
         'job',
         'sss',
         'philhealth',
@@ -39,6 +40,10 @@ class Employee extends Model
     public function payroll(): HasMany
     {
         return $this->hasMany(Payroll::class);    
+    }
+    public function payslip(): HasMany
+    {
+        return $this->hasMany(Payslip::class);    
     }
     public function qr(): HasMany
     {

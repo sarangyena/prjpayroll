@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payrolls', function (Blueprint $table) {
+        Schema::create('payslips', function (Blueprint $table) {
             $table->id();
             $table->string('pay_id')->unique();
+            $table->timestamp('hired');
             $table->foreignId('employee_id')->constrained()->cascadeOnDelete();
-            $table->string('user_name')->nullable();
-            $table->bigInteger('week_id')->nullable();
-            $table->bigInteger('month_id')->nullable();
-            $table->bigInteger('year_id')->nullable();
-            $table->string('name')->nullable();
-            $table->string('job')->nullable();
+            $table->string('user_name');
+            $table->bigInteger('week_id');
+            $table->bigInteger('month_id');
+            $table->bigInteger('year_id');
+            $table->string('name');
+            $table->string('job');
+            $table->string('pay_period');
             $table->decimal('rate', 8, 2);
             $table->decimal('days', 8, 2)->default(0);
             $table->decimal('late', 8, 2)->default(0);
@@ -44,6 +46,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payrolls');
+        Schema::dropIfExists('payslips');
     }
 };
