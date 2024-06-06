@@ -298,7 +298,7 @@ class AdminController extends Controller
                     $columns[] = $attribute;
                 }
                 $sentence = Str::title(implode(', ', $columns));
-                $log->log = 'Admin ' . auth()->user()->user_name . ' updated ' . $payslip->user_name . '. The columns edited are ' . $sentence . '.';
+                $log->log = 'Admin ' . auth()->user()->user_name . ' updated ' . $payslip->user_name . '. The columns edited are ' . $sentence . '. Remarks: '.$data['remarks'].'.';
                 $log->user()->associate($user);
                 $log->save();
                 return redirect()->route('a-payslip')->with('success', 'Successfully edited payroll.');
