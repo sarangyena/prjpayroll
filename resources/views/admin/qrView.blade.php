@@ -1,5 +1,4 @@
 <x-app-layout>
-    @include('partials._log')
     @include('partials._qrview')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>

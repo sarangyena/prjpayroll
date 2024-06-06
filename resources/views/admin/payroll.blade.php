@@ -151,22 +151,22 @@
                                                 ₱ {{ $d['otpay'] }}
                                             </td>
                                             <td class="px-4 py-3 hide" hidden>
-                                                ₱ {{ $d['otpay'] }}
+                                                ₱ {{ $d['holiday'] }}
                                             </td>
                                             <td class="px-4 py-3 hide" hidden>
-                                                ₱ {{ $d['otpay'] }}
+                                                ₱ {{ $d['sss'] }}
                                             </td>
                                             <td class="px-4 py-3 hide" hidden>
-                                                ₱ {{ $d['otpay'] }}
+                                                ₱ {{ $d['philhealth'] }}
                                             </td>
                                             <td class="px-4 py-3 hide" hidden>
-                                                ₱ {{ $d['otpay'] }}
+                                                ₱ {{ $d['advance'] }}
                                             </td>
                                             <td class="px-4 py-3">
                                                 ₱ {{ $d['gross'] }}
                                             </td>
                                             <td class="px-4 py-3">
-                                                ₱ {{ $d['otpay'] }}
+                                                ₱ {{ $d['deductions'] }}
                                             </td>
                                             <td class="px-4 py-3">
                                                 ₱ {{ $d['net'] }}

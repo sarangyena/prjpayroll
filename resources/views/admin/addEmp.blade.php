@@ -80,6 +80,14 @@
                 $('#empForm')[0].reset();
                 $("#imagePreview").attr("src", "{{ asset('images/user.png') }}");
             })
+            $('#eAddC').change(function(){
+                if ($(this).is(':checked')) {
+                    $('#eAdd').val($('#address').val());
+
+                }else{
+                    $('#eAdd').val('');
+                }
+            })
         })
     </script>
 </x-app-layout>

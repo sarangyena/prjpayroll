@@ -23,25 +23,22 @@ class ViewController extends Controller
     private $yearId;
     private $admin;
     private $log;
+    private $start;
+    private $end;
+    private $week;
 
     public function __construct()
     {
         //Dates
-        $this->current = Carbon::today();
-        $firstDay = $this->current->copy()->startOfWeek();
-        $this->firstDay = $firstDay->format('F j, Y');
-        $this->lastDay = $this->current->format('F j, Y');
-        $this->weekId = $this->current->week();
+        $this->current = Carbon::now();
+        $this->start = $this->current->startOfWeek(Carbon::SATURDAY);
+        $this->end = $this->start->clone()->addDays(6);
+        $this->week = $this->start->format('F jS, Y') . ' - ' . $this->end->format('F jS, Y');
+        $this->weekId = $this->start->weekOfYear;
         $this->monthId = $this->current->month;
         $this->yearId = $this->current->year;
         //Admin
         $this->admin = auth()->user();
-        //Log
-        if ($this->admin != null) {
-            $this->log = Log::where('user_id', $this->admin->id)
-                ->whereDate('created_at', $this->current)
-                ->get();
-        }
     }
 
     public function index(): View
@@ -68,12 +65,12 @@ class ViewController extends Controller
         Cache::forget('data');
         $data = [];
         $data['emp'] = Employee::count();
-        $temp = Payroll::where('month_id', $this->monthId)->get();
+        $temp = Payslip::where('month_id', $this->monthId)->get();
         $data['month'] = 0;
         foreach ($temp as $t) {
             $data['month'] = $data['month'] + $t->net;
         }
-        $temp = Payroll::where('year_Id', $this->yearId)->get();
+        $temp = Payslip::where('year_Id', $this->yearId)->get();
         $data['year'] = 0;
         foreach ($temp as $t) {
             $data['year'] = $data['year'] + $t->net;
@@ -105,12 +102,12 @@ class ViewController extends Controller
     {
         Cache::forget('data');
         $data = [];
-        $temp = Payroll::where('user_name', auth()->user()->user_name)->where('month_id', $this->monthId)->get();
+        $temp = Payslip::where('user_name', auth()->user()->user_name)->where('month_id', $this->monthId)->get();
         $data['month'] = 0;
         foreach ($temp as $t) {
             $data['month'] = $data['month'] + $t->net;
         }
-        $temp = Payroll::where('user_name', auth()->user()->user_name)->where('year_Id', $this->yearId)->get();
+        $temp = Payslip::where('user_name', auth()->user()->user_name)->where('year_Id', $this->yearId)->get();
         $data['year'] = 0;
         foreach ($temp as $t) {
             $data['year'] = $data['year'] + $t->net;
@@ -180,7 +177,7 @@ class ViewController extends Controller
     public function payView(Request $request): View
     {
         Cache::forget('data');
-        $data = Payroll::paginate();
+        $data = Payslip::paginate();
         return view('admin.payView', [
             'data' => $data,
             'log' => $this->log,
@@ -189,7 +186,7 @@ class ViewController extends Controller
     public function payroll(Request $request): View
     {
         $data = null;
-        return view('admin.generate', [
+        return view('admin.payroll', [
             'data' => $data,
         ]);
     }
@@ -249,7 +246,7 @@ class ViewController extends Controller
     public function empPay(): View
     {
         Cache::forget('data');
-        $payroll = Payroll::where('user_name', auth()->user()->user_name)->paginate();
+        $payroll = Payslip::where('user_name', auth()->user()->user_name)->paginate();
         return view('user.payroll', [
             'data' => $payroll,
         ]);

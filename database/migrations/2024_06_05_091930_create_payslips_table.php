@@ -37,6 +37,7 @@ return new class extends Migration
             $table->decimal('gross', 8, 2)->default(0);
             $table->decimal('deduction', 8, 2)->default(0);
             $table->decimal('net', 8, 2)->default(0);
+            $table->string('remarks')->nullable();
             $table->timestamps();
         });
     }

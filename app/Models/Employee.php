@@ -28,6 +28,7 @@ class Employee extends Model
         'ePhone',
         'eAdd',
         'eStatus',
+        'remarks',
     ];
     public function image(): HasOne
     {
@@ -36,10 +37,6 @@ class Employee extends Model
     public function user(): HasOne
     {
         return $this->hasOne(User::class);    
-    }
-    public function payroll(): HasMany
-    {
-        return $this->hasMany(Payroll::class);    
     }
     public function payslip(): HasMany
     {

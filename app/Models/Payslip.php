@@ -33,6 +33,7 @@ class Payslip extends Model
         'gross',
         'deduction',
         'net',
+        'remarks',
     ]; 
     public function emp(): BelongsTo
     {

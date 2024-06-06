@@ -20,10 +20,10 @@
                         request()->routeIs('a-editEmp')">
                         {{ __('Employee') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('a-payroll')" :active="request()->routeIs('a-payView') || request()->routeIs('a-editPay') || request()->routeIs('a-payroll')">
+                    <x-nav-link :href="route('a-payroll')" :active="request()->routeIs('a-payroll')">
                         {{ __('Payroll') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('a-payslip')" :active="request()->routeIs('a-payslip')">
+                    <x-nav-link :href="route('a-payslip')" :active="request()->routeIs('a-payslip') || request()->routeIs('a-editPay')">
                         {{ __('Payslip') }}
                     </x-nav-link>
                     <x-nav-link :href="route('a-qrView')" :active="request()->routeIs('a-qrView')">

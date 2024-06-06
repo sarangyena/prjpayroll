@@ -24,7 +24,6 @@
             </div>
         </div>
     </div>
-    @include('partials._log')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -48,13 +47,6 @@
                             reader.readAsDataURL(input.files[0]);
                         }
                     });
-            //Convert to Uppercase
-            $('#empForm input[type="text"]').on('input', function() {
-                $(this).val($(this).val().toUpperCase());
-            });
-            $('#empForm input[type="email"]').on('input', function() {
-                $(this).val($(this).val().toUpperCase());
-            });
             // EMPLOYEE
             $('#emp').change(function() {
                 if ($(this).is(':checked')) {

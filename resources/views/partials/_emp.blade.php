@@ -165,7 +165,21 @@
             @error('eAdd')
                 <x-error>{{ $message }}</x-error>
             @enderror
+            <div class="flex items-center mt-1">
+                <input id="eAddC" type="checkbox"
+                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                <label for="eAddC"
+                    class="ms-2 text-sm font-medium text-gray-900">Same Address</label>
+            </div>
         </div>
+        @if (isset($employee))
+            <x-input-label for="remarks" :value="__('Remarks:')" class="mt-2" />
+            <x-text-input id="remarks" class="block mt-1 w-full" type="text" name="remarks"
+                value="{{ isset($employee) ? $employee->remarks : old('remarks') }}" required />
+            @error('remarks')
+                <x-error>{{ $message }}</x-error>
+            @enderror
+        @endif
     </div>
 
     <div class="flex justify-between lg:justify-start lg:gap-3 lg:flex-row-reverse">

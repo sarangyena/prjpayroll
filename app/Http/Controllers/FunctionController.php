@@ -41,12 +41,6 @@ class FunctionController extends Controller
         $this->yearId = $this->current->year;
         //Admin
         $this->admin = auth()->user();
-        //Log
-        if ($this->admin->user_name == 'ADMIN') {
-            $this->log = Log::where('user_id', $this->admin->id)
-                ->whereDate('created_at', $this->current)
-                ->get();
-        }
     }
     public function username(Request $request)
     {
@@ -258,7 +252,7 @@ class FunctionController extends Controller
     public function month(Request $request)
     {
         $month = Carbon::parse("1 $request->month");
-        $payroll = Payroll::where('month_id', $month->month)->get();
+        $payroll = Payslip::where('month_id', $month->month)->get();
         if (count($payroll) >= 1) {
             $net = 0;
             foreach ($payroll as $p) {
@@ -272,7 +266,7 @@ class FunctionController extends Controller
     public function year(Request $request)
     {
         $year = (int)$request->year;
-        $payroll = Payroll::where('year_id', $year)->get();
+        $payroll = Payslip::where('year_id', $year)->get();
         if (count($payroll) >= 1) {
             $net = 0;
             foreach ($payroll as $p) {
@@ -286,7 +280,7 @@ class FunctionController extends Controller
     public function empMonth(Request $request)
     {
         $month = Carbon::parse("1 $request->month");
-        $payroll = Payroll::where('user_name', auth()->user()->user_name)->where('month_id', $month->month)->get();
+        $payroll = Payslip::where('user_name', auth()->user()->user_name)->where('month_id', $month->month)->get();
         if (count($payroll) >= 1) {
             $net = 0;
             foreach ($payroll as $p) {
@@ -300,7 +294,7 @@ class FunctionController extends Controller
     public function empYear(Request $request)
     {
         $year = (int)$request->year;
-        $payroll = Payroll::where('user_name', auth()->user()->user_name)->where('year_id', $year)->get();
+        $payroll = Payslip::where('user_name', auth()->user()->user_name)->where('year_id', $year)->get();
         if (count($payroll) >= 1) {
             $net = 0;
             foreach ($payroll as $p) {
@@ -335,7 +329,7 @@ class FunctionController extends Controller
                     $data = [];
                     $data['days'] = 0;
                     $data['late'] = 0;
-                    $data['ot'] = 0;
+                    $data['hrs'] = 0;
                     foreach ($qr as $q) {
                         $diff = $q->created_at->diffInHours($q->updated_at);
                         $diff > 8 ? $data['days'] += 1 : $data['days'] += $diff / 8;
@@ -349,7 +343,7 @@ class FunctionController extends Controller
                             }
                         }
                         if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00')) {
-                            $data['ot'] += Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
+                            $data['hrs'] += Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
                         }
                     }
                     $payslip = Payslip::where('user_name', $e->user_name)->where('week_id', $week)->first();
@@ -368,12 +362,12 @@ class FunctionController extends Controller
                     }
                     $data['name'] = $e->last_name . ', ' . $e->first_name . ' ' . $e->middle_name;
                     $data['job'] = $e->job;
-                    $data['rate'] = 430;
+                    $data['rate'] = $e->rate;
                     $data['salary'] = $data['rate'] * $data['days'] - ($data['rate'] / 8 * $data['late']);
                     $data['rph'] = ($data['rate'] / 8) + ($data['rate'] / 8) * 0.2;
-                    $data['otpay'] = $data['rph'] * $data['ot'];
-                    $data['gross'] = $data['salary'] + $data['otpay'];
-                    $data['net'] = $data['gross'];
+                    $data['otpay'] = $data['rph'] * $data['hrs'];
+                    $data['gross'] = $payslip != null ? $data['salary'] + $data['otpay'] + $payslip->holiday : $data['salary'] + $data['otpay'];
+                    $data['net'] = $payslip != null ? $data['gross'] - $payslip->deduction : $data['gross'] ;
                     if ($payslip != null) {
                         $payslip->update($data);
                     } else {
@@ -422,7 +416,7 @@ class FunctionController extends Controller
                             $data[$e->user_name]['ot'] += Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
                         }
                     }
-                    $payslip = Payslip::where('user_name', $e->user_name)->where('week_id', $this->week)->first();
+                    $payslip = Payslip::where('user_name', $e->user_name)->where('week_id', $this->weekId)->first();
                     $data[$e->user_name]['hired'] = $e->created_at;
                     $data[$e->user_name]['user_name'] = $e->user_name;
                     $data[$e->user_name]['week_id'] = $this->weekId;
@@ -432,11 +426,25 @@ class FunctionController extends Controller
                     $data[$e->user_name]['name'] = $e->last_name . ', ' . $e->first_name . ' ' . $e->middle_name;
                     $data[$e->user_name]['job'] = $e->job;
                     $data[$e->user_name]['rate'] = 430;
+                    if($payslip != null){
+                        $data[$e->user_name]['holiday'] = (float)$payslip->holiday;
+                        $data[$e->user_name]['sss'] = (float)$payslip->sss;
+                        $data[$e->user_name]['philhealth'] = (float)$payslip->philhealth;
+                        $data[$e->user_name]['advance'] = (float)$payslip->advance;
+                        $data[$e->user_name]['deductions'] = (float)$payslip->deduction;
+                    }else{
+                        $data[$e->user_name]['holiday'] = 0;
+                        $data[$e->user_name]['sss'] = 0;
+                        $data[$e->user_name]['philhealth'] = 0;
+                        $data[$e->user_name]['advance'] = 0;
+                        $data[$e->user_name]['deductions'] =0;
+
+                    }
                     $data[$e->user_name]['salary'] = $data[$e->user_name]['rate'] * $data[$e->user_name]['days'] - ($data[$e->user_name]['rate'] / 8 * $data[$e->user_name]['late']);
                     $data[$e->user_name]['rph'] = ($data[$e->user_name]['rate'] / 8) + ($data[$e->user_name]['rate'] / 8) * 0.2;
                     $data[$e->user_name]['otpay'] = $data[$e->user_name]['rph'] * $data[$e->user_name]['ot'];
-                    $data[$e->user_name]['gross'] = $data[$e->user_name]['salary'] + $data[$e->user_name]['otpay'];
-                    $data[$e->user_name]['net'] = $data[$e->user_name]['gross'];
+                    $data[$e->user_name]['gross'] = $payslip != null ? $data[$e->user_name]['salary'] + $data[$e->user_name]['otpay'] + $payslip->holiday : $data[$e->user_name]['salary'] + $data[$e->user_name]['otpay'];
+                    $data[$e->user_name]['net'] = $payslip != null ? $data[$e->user_name]['gross'] - $payslip->deductions : $data[$e->user_name]['gross'];
                 }
             }   
             Cache::forget('data'); // 10 years
