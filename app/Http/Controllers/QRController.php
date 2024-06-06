@@ -83,6 +83,12 @@ class QRController extends Controller
             ]);
         }
         $qr = QR::where('user_name', $data['id'])->latest()->first();
+        $diff = $qr->created_at->diffInMinutes(Carbon::now());
+        if($diff < 30){
+            return response()->json([
+                'timed' => true,
+            ]);
+        }
         $temp = [];
         $temp['week_id'] = $this->weekId;
         $temp['user_name'] = $employee->user_name;

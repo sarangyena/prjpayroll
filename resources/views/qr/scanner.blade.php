@@ -197,6 +197,10 @@
                                         dataObject.message = "Employee does not exist.";
                                         var jsonData = JSON.stringify(dataObject);
                                         window.location.href = '/session?error=' + encodeURIComponent(jsonData);
+                                    }else if(data2.timed == true){
+                                        dataObject.message = "Already timed in.";
+                                        var jsonData = JSON.stringify(dataObject);
+                                        window.location.href = '/session?error=' + encodeURIComponent(jsonData);
                                     }
                                 })
                         });

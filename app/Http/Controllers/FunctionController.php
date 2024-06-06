@@ -342,9 +342,12 @@ class FunctionController extends Controller
                                 $data['late'] >= 60 ? $data['late'] /= 60 : $data['late'];
                             }
                         }
-                        if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00')) {
-                            $data['hrs'] += Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
+                        if($q->created_at != $q->updated_at){
+                            if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00')) {
+                                $data['hrs'] += Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
+                            }
                         }
+                        
                     }
                     $payslip = Payslip::where('user_name', $e->user_name)->where('week_id', $week)->first();
                     if ($payslip == null) {
@@ -412,8 +415,10 @@ class FunctionController extends Controller
                                 $data[$e->user_name]['late'] >= 60 ? $data[$e->user_name]['late'] /= 60 : $data[$e->user_name]['late'];
                             }
                         }
-                        if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00')) {
-                            $data[$e->user_name]['ot'] += Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
+                        if($q->created_at != $q->updated_at){
+                            if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00')) {
+                                $data[$e->user_name]['ot'] += Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
+                            }
                         }
                     }
                     $payslip = Payslip::where('user_name', $e->user_name)->where('week_id', $this->weekId)->first();
