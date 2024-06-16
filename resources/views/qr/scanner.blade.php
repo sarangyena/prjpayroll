@@ -14,7 +14,7 @@
                     @elseif (session('danger'))
                         <x-danger-alert />
                     @endif
-                    <div class="">
+                    <div>
                         @php
                             $data1 = session()->get('data1');
                             if (!isset($data1)) {
@@ -26,6 +26,7 @@
                                 $data1['image_data'] = '';
                             }
                         @endphp
+                        <div id="realtime-clock" class="font-bold text-3xl text-center my-3"></div>
                         <div class="mt-3 lg:columns-2">
                             <div id="reader" class="w-9/12 mx-auto"></div>
 
@@ -37,6 +38,7 @@
                                         <img src="{{ asset('images/user.png') }}" class="w-1/3 mx-auto"
                                             id="imagePreview">
                                         <div class="">
+
                                             <div class="columns-2 mt-2">
                                                 <div>
                                                     <x-input-label for="user_name" :value="__('User ID:')" />
@@ -78,6 +80,23 @@
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script type="application/javascript">
             $(document).ready(function() {
+                setInterval(updateClock, 1000);
+
+                function updateClock() {
+                    var now = new Date();
+                    var options = { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric', 
+                        hour: 'numeric', 
+                        minute: 'numeric', 
+                        second: 'numeric',
+                        timeZoneName: 'short'
+                    };
+                    var formattedDateTime = now.toLocaleString('en-US', options);
+                    $('#realtime-clock').text(formattedDateTime);
+                }
                 @if ($data1['image_data'] != '')
                     var imageData = '@php $blob = $data1['image_data']; $dataUri = "data:image/jpeg;base64," . base64_encode($blob); echo $dataUri @endphp';
                     var imagePreview = document.getElementById('imagePreview');

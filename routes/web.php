@@ -5,11 +5,7 @@ use App\Http\Controllers\FunctionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QRController;
 use App\Http\Controllers\ViewController;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 Route::get('/', [ViewController::class, 'index'])->name('index');
 

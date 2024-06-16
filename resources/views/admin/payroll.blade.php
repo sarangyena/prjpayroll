@@ -10,7 +10,7 @@
                 <div class="p-4 text-gray-900">
                     <p class="font-bold text-2xl border-b-2 border-green-300 text-center lg:text-left">GENERATE PAYROLL
                     </p>
-                    <div class="flex justify-between">
+                    <div class="lg:flex lg:justify-between">
                         <form method="post" action="{{ route('a-payroll') }}" class="flex gap-5 mt-3">
                             @csrf
                             <x-date-range />
@@ -23,6 +23,12 @@
                                 </svg>
                             </button>
                         </form>
+                        <div class="flex justify-between mt-2 lg: gap-3" id="export">
+                            <a href="{{route('p-payroll')}}" class="">
+                                <x-export />
+                            </a>    
+                            <x-hide />
+                        </div>
                     </div>
                     @if (Cache::get('data'))
                         @php
@@ -37,13 +43,6 @@
                     @if ($data == null)
                         <x-info-alert />
                     @else
-                        <div class="flex gap-3">
-                            <a href="{{route('p-payroll')}}" class="">
-                                <x-print />
-                            </a>    
-                            <x-hide />
-                            
-                        </div>
                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-3">
                             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
                                 id="view">
@@ -173,7 +172,6 @@
                                             </td>
                                         </tr>
                                     @endforeach
-
                                 </tbody>
                             </table>
                         </div>
@@ -187,6 +185,9 @@
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script type="application/javascript">
         $(document).ready(function(){
+            if ($('#view tbody tr').length < 1) {
+                $('#export').hide();
+            }
             $('#search').on('input', function() {
                 var inputValue = $(this).val().toUpperCase();
                 $('#view tbody tr').filter(function() {

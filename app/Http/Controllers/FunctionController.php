@@ -314,40 +314,59 @@ class FunctionController extends Controller
             $wdOff = ($fYear->dayOfWeek - Carbon::SATURDAY) % 7;
             $wkOff = ($week - 1) * 7 - $wdOff;
             $start = $fYear->addDays($wkOff);
-            $end = $start->copy()->addDays(6);
             $emp = Employee::all();
             foreach ($emp as $e) {
-                if($e->role == 'EMPLOYEE'){
-                    $weekday_offset = ($this->current->dayOfWeek - Carbon::SATURDAY) % 7;
-                    $start_date = $this->current->subDays($weekday_offset);
-                    $end_date = $start_date->copy()->addDays(14);
-                    $qr = QR::where('user_name', $e->user_name)->whereBetween('created_at', [$start_date, $end_date])->get();
-                }else if($e->role == 'ON-CALL'){
-                    $qr = QR::where('user_name', $e->user_name)->whereBetween('created_at', [$start, $end])->get();
+                if ($e->role == 'EMPLOYEE') {
+                    $end = $start->copy()->addDays(14);
+                } else if ($e->role == 'ON-CALL') {
+                    $end = $start->copy()->addDays(7);
                 }
+                $weekP = $start->format('F jS, Y') . ' - ' . $end->format('F jS, Y');
+                $qr = QR::where('user_name', $e->user_name)->whereBetween('created_at', [$start, $end])->get();
                 if (!$qr->isEmpty()) {
                     $data = [];
                     $data['days'] = 0;
                     $data['late'] = 0;
                     $data['hrs'] = 0;
                     foreach ($qr as $q) {
-                        $diff = $q->created_at->diffInHours($q->updated_at);
-                        $diff > 8 ? $data['days'] += 1 : $data['days'] += $diff / 8;
-                        if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '08:16:00') && $q->created_at < Carbon::parse($q->created_at->format('Y-m-d') . '12:00:00')) {
-                            if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '08:31:00')) {
-                                $data['late'] += Carbon::parse($q->created_at->format('Y-m-d') . '08:31:00')->diffInMinutes($q->created_at) + 30;
-                                $data['late'] >= 60 ? $data['late'] /= 60 : $data['late'];
-                            } else {
-                                $data['late'] += 30;
-                                $data['late'] >= 60 ? $data['late'] /= 60 : $data['late'];
+                        if ($q->created_at != $q->updated_at) {
+                            if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '08:16:00') && $q->created_at < Carbon::parse($q->created_at->format('Y-m-d') . '12:00:00')) {
+                                if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '09:00:00')) {
+                                    $temp = Carbon::parse($q->created_at->format('Y-m-d') . '08:15:00')->diffInMinutes($q->created_at);
+                                    $temp1 = floor($temp);
+                                    $temp1 = $temp - $temp1;
+                                    if ($temp1 >= 0.5) {
+                                        $data['late'] += ceil($temp);
+                                    } else {
+                                        $data['late'] += floor($temp);
+                                    }
+                                } else {
+                                    $data['late'] += 30;
+                                }
                             }
-                        }
-                        if($q->created_at != $q->updated_at){
-                            if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00')) {
-                                $data['hrs'] += Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
+
+                            $temp = $q->created_at->diffInMinutes($q->updated_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00') ? Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00') : $q->updated_at) - 60;
+                            $temp1 = Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
+                            if ($temp1 > 0) {
+                                $data['hrs'] += round($temp1, 2);
                             }
+                            $temp1 = $q->updated_at->format("i");
+                            if ($temp1 < 30 && $q->updated_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00')) {
+                                $temp -= 30;
+                            }
+                            $data['days'] += round($temp, 1);
                         }
-                        
+                    }
+                    if ($data['late'] != 0) {
+                        $data['days'] -= $data['late'];
+                    }
+                    $temp = ($data['days']  / 60) / 8;
+                    $temp1 = floor($temp);
+                    $temp1 = $temp - $temp1;
+                    if ($temp1 >= 0.5) {
+                        $data['days'] = ceil($temp);
+                    } else {
+                        $data['days'] = floor($temp);
                     }
                     $payslip = Payslip::where('user_name', $e->user_name)->where('week_id', $week)->first();
                     if ($payslip == null) {
@@ -356,21 +375,21 @@ class FunctionController extends Controller
                     $data['hired'] = $e->created_at;
                     $data['user_name'] = $e->user_name;
                     $data['week_id'] = $week;
-                    $data['month_id'] = $this->monthId;
-                    $data['year_id'] = $this->yearId;
-                    if ($e->role == 'EMPLOYEE') {
-                        $data['pay_period'] = $start_date->format('F jS, Y') . ' - ' . $end_date->format('F jS, Y');
-                    } else if ($e->role == 'ON-CALL') {
-                        $data['pay_period'] = $this->week;
-                    }
+                    $data['month_id'] = $start->month;
+                    $data['year_id'] = $start->year;
+                    $data['pay_period'] = $weekP;
                     $data['name'] = $e->last_name . ', ' . $e->first_name . ' ' . $e->middle_name;
                     $data['job'] = $e->job;
                     $data['rate'] = $e->rate;
-                    $data['salary'] = $data['rate'] * $data['days'] - ($data['rate'] / 8 * $data['late']);
+                    $data['salary'] = $data['rate'] * $data['days'];
                     $data['rph'] = ($data['rate'] / 8) + ($data['rate'] / 8) * 0.2;
                     $data['otpay'] = $data['rph'] * $data['hrs'];
                     $data['gross'] = $payslip != null ? $data['salary'] + $data['otpay'] + $payslip->holiday : $data['salary'] + $data['otpay'];
-                    $data['net'] = $payslip != null ? $data['gross'] - $payslip->deduction : $data['gross'] ;
+                    $data['net'] = $payslip != null ? $data['gross'] - $payslip->deduction : $data['gross'];
+                    $data['days'] = $data['days'] < 0 ? 0 : $data['days'];
+                    $data['hrs'] = $data['hrs'] < 0 ? 0 : $data['hrs'];
+                    $data['gross'] = $data['gross'] < 0 ? 0 : $data['gross'];
+                    $data['net'] = $data['net'] < 0 ? 0 : $data['net'];
                     if ($payslip != null) {
                         $payslip->update($data);
                     } else {
@@ -404,23 +423,46 @@ class FunctionController extends Controller
                     $data[$e->user_name]['late'] = 0;
                     $data[$e->user_name]['ot'] = 0;
                     foreach ($qr as $q) {
-                        $diff = $q->created_at->diffInHours($q->updated_at);
-                        $diff > 8 ? $data[$e->user_name]['days'] += 1 : $data[$e->user_name]['days'] += $diff / 8;
-                        if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '08:16:00') && $q->created_at < Carbon::parse($q->created_at->format('Y-m-d') . '12:00:00')) {
-                            if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '08:31:00')) {
-                                $data[$e->user_name]['late'] += Carbon::parse($q->created_at->format('Y-m-d') . '08:31:00')->diffInMinutes($q->created_at) + 30;
-                                $data[$e->user_name]['late'] >= 60 ? $data[$e->user_name]['late'] /= 60 : $data[$e->user_name]['late'];
-                            } else {
-                                $data[$e->user_name]['late'] += 30;
-                                $data[$e->user_name]['late'] >= 60 ? $data[$e->user_name]['late'] /= 60 : $data[$e->user_name]['late'];
+                        if ($q->created_at != $q->updated_at) {
+                            if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '08:16:00') && $q->created_at < Carbon::parse($q->created_at->format('Y-m-d') . '12:00:00')) {
+                                if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '09:00:00')) {
+                                    $temp = Carbon::parse($q->created_at->format('Y-m-d') . '08:15:00')->diffInMinutes($q->created_at);
+                                    $temp1 = floor($temp);
+                                    $temp1 = $temp - $temp1;
+                                    if ($temp1 >= 0.5) {
+                                        $data[$e->user_name]['late'] += ceil($temp);
+                                    } else {
+                                        $data[$e->user_name]['late'] += floor($temp);
+                                    }
+                                } else {
+                                    $data[$e->user_name]['late'] += 30;
+                                }
                             }
-                        }
-                        if($q->created_at != $q->updated_at){
-                            if ($q->created_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00')) {
-                                $data[$e->user_name]['ot'] += Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
+
+                            $temp = $q->created_at->diffInMinutes($q->updated_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00') ? Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00') : $q->updated_at) - 60;
+                            $temp1 = Carbon::parse($q->created_at->format('Y-m-d') . '18:00:00')->diffInHours($q->updated_at);
+                            if ($temp1 > 0) {
+                                $data[$e->user_name]['ot'] += round($temp1, 2);
                             }
+                            $temp1 = $q->updated_at->format("i");
+                            if ($temp1 < 30 && $q->updated_at >= Carbon::parse($q->created_at->format('Y-m-d') . '17:00:00')) {
+                                $temp -= 30;
+                            }
+                            $data[$e->user_name]['days'] += round($temp, 1);
                         }
                     }
+                    if ($data[$e->user_name]['late'] != 0) {
+                        $data[$e->user_name]['days'] -= $data[$e->user_name]['late'];
+                    }
+                    $temp = ($data[$e->user_name]['days']  / 60) / 8;
+                    $temp1 = floor($temp);
+                    $temp1 = $temp - $temp1;
+                    if ($temp1 >= 0.5) {
+                        $data[$e->user_name]['days'] = ceil($temp);
+                    } else {
+                        $data[$e->user_name]['days'] = floor($temp);
+                    }
+
                     $payslip = Payslip::where('user_name', $e->user_name)->where('week_id', $this->weekId)->first();
                     $data[$e->user_name]['hired'] = $e->created_at;
                     $data[$e->user_name]['user_name'] = $e->user_name;
@@ -430,28 +472,31 @@ class FunctionController extends Controller
                     $data[$e->user_name]['pay_period'] = Carbon::parse($start)->format('F jS, Y') . ' - ' . Carbon::parse($end)->format('F jS, Y');
                     $data[$e->user_name]['name'] = $e->last_name . ', ' . $e->first_name . ' ' . $e->middle_name;
                     $data[$e->user_name]['job'] = $e->job;
-                    $data[$e->user_name]['rate'] = 430;
-                    if($payslip != null){
+                    $data[$e->user_name]['rate'] = $e->rate;
+                    if ($payslip != null) {
                         $data[$e->user_name]['holiday'] = (float)$payslip->holiday;
                         $data[$e->user_name]['sss'] = (float)$payslip->sss;
                         $data[$e->user_name]['philhealth'] = (float)$payslip->philhealth;
                         $data[$e->user_name]['advance'] = (float)$payslip->advance;
                         $data[$e->user_name]['deductions'] = (float)$payslip->deduction;
-                    }else{
+                    } else {
                         $data[$e->user_name]['holiday'] = 0;
                         $data[$e->user_name]['sss'] = 0;
                         $data[$e->user_name]['philhealth'] = 0;
                         $data[$e->user_name]['advance'] = 0;
-                        $data[$e->user_name]['deductions'] =0;
-
+                        $data[$e->user_name]['deductions'] = 0;
                     }
-                    $data[$e->user_name]['salary'] = $data[$e->user_name]['rate'] * $data[$e->user_name]['days'] - ($data[$e->user_name]['rate'] / 8 * $data[$e->user_name]['late']);
+                    $data[$e->user_name]['salary'] = $data[$e->user_name]['rate'] * $data[$e->user_name]['days'];
                     $data[$e->user_name]['rph'] = ($data[$e->user_name]['rate'] / 8) + ($data[$e->user_name]['rate'] / 8) * 0.2;
                     $data[$e->user_name]['otpay'] = $data[$e->user_name]['rph'] * $data[$e->user_name]['ot'];
-                    $data[$e->user_name]['gross'] = $payslip != null ? $data[$e->user_name]['salary'] + $data[$e->user_name]['otpay'] + $payslip->holiday : $data[$e->user_name]['salary'] + $data[$e->user_name]['otpay'];
-                    $data[$e->user_name]['net'] = $payslip != null ? $data[$e->user_name]['gross'] - $payslip->deductions : $data[$e->user_name]['gross'];
+                    $data[$e->user_name]['gross'] = $data[$e->user_name]['salary'] + $data[$e->user_name]['otpay'] + $data[$e->user_name]['holiday'];
+                    $data[$e->user_name]['net'] = $data[$e->user_name]['gross'] - $data[$e->user_name]['deductions'];
+                    $data[$e->user_name]['days'] = $data[$e->user_name]['days'] < 0 ? 0 : $data[$e->user_name]['days'];
+                    $data[$e->user_name]['ot'] = $data[$e->user_name]['ot'] < 0 ? 0 : $data[$e->user_name]['ot'];
+                    $data[$e->user_name]['gross'] = $data[$e->user_name]['gross'] < 0 ? 0 : $data[$e->user_name]['gross'];
+                    $data[$e->user_name]['net'] = $data[$e->user_name]['net'] < 0 ? 0 : $data[$e->user_name]['net'];
                 }
-            }   
+            }
             Cache::forget('data'); // 10 years
             Cache::put('data', $data, 60 * 60 * 24 * 365 * 10); // 10 years
             return redirect()->back();

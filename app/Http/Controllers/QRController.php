@@ -77,18 +77,21 @@ class QRController extends Controller
     {
         $data = $request->all();
         $employee = Employee::where('user_name', $data['id'])->first();
-        if ($employee==null) {
+        if ($employee == null) {
             return response()->json([
                 'error' => true,
             ]);
         }
         $qr = QR::where('user_name', $data['id'])->latest()->first();
-        $diff = $qr->created_at->diffInMinutes(Carbon::now());
-        if($diff < 30){
-            return response()->json([
-                'timed' => true,
-            ]);
+        if (!empty($qr)) {
+            $diff = $qr->created_at->diffInMinutes(Carbon::now());
+            if ($diff < 30) {
+                return response()->json([
+                    'timed' => true,
+                ]);
+            }
         }
+
         $temp = [];
         $temp['week_id'] = $this->weekId;
         $temp['user_name'] = $employee->user_name;
@@ -105,11 +108,18 @@ class QRController extends Controller
             ]);
         } else {
             if ($qr->created_at == $qr->updated_at) {
-                $qr->touch();
-                $qr->save();
-                return response()->json([
-                    'update' => true,
-                ]);
+                if (($qr->created_at->format('Y-m-d') != Carbon::now()->format('Y-m-d'))) {
+                    $employee->qr()->create($temp);
+                    return response()->json([
+                        'add' => true,
+                    ]);
+                } else {
+                    $qr->touch();
+                    $qr->save();
+                    return response()->json([
+                        'update' => true,
+                    ]);
+                }
             }
         }
     }

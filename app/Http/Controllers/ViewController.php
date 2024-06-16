@@ -41,7 +41,7 @@ class ViewController extends Controller
         $this->admin = auth()->user();
     }
 
-    public function index(): View
+    public function index()
     {
         Cache::forget('data');
         $temp = Employee::all();
@@ -58,7 +58,19 @@ class ViewController extends Controller
                 }
             }
         }
-        return view('auth.login');
+        if(auth()->user() != null){
+            if(auth()->user()->user_type == 'ADMIN'){
+                return redirect()->route('a-dashboard');
+            }else if(auth()->user()->user_type == 'USER'){
+                return redirect()->route('u-dashboard');
+            }else if(auth()->user()->user_type == 'QR'){
+                return redirect()->route('qr-scanner');
+            }else{
+                return view('auth.login');
+            }
+        }else{
+            return view('auth.login');
+        }
     }
     public function adminDash(): View
     {

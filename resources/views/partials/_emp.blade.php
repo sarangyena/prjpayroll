@@ -128,7 +128,7 @@
     </div>
     <x-input-label for="rate" :value="__('Rate:')" class="mt-2" />
     <x-text-input id="rate" class="block mt-1 w-full" type="text" name="rate"
-        value="{{ isset($employee) ? $employee->rate : old('rate') }}" value="430" />
+        value="{{ isset($employee) ? $employee->rate : 430}}" />
     @error('rate')
         <x-error>{{ $message }}</x-error>
     @enderror

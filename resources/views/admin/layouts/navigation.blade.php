@@ -96,19 +96,22 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('a-dashboard')" :active="request()->routeIs('a-dashboard')">
+            <x-nav-link :href="route('a-dashboard')" :active="request()->routeIs('a-dashboard')">
                 {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('a-addEmp')" :active="request()->routeIs('a-addEmp') ||
+            </x-nav-link>
+            <x-responsive-nav-link :href="route('a-empView')" :active="request()->routeIs('a-addEmp') ||
                 request()->routeIs('a-empView') ||
                 request()->routeIs('a-editEmp')">
                 {{ __('Employee') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('a-payView')" :active="request()->routeIs('a-payView') || request()->routeIs('a-editPay')">
+            <x-responsive-nav-link :href="route('a-payroll')" :active="request()->routeIs('a-payroll')">
                 {{ __('Payroll') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('a-payslip')" :active="request()->routeIs('a-payslip') || request()->routeIs('a-editPay')">
+                {{ __('Payslip') }}
+            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('a-qrView')" :active="request()->routeIs('a-qrView')">
-                {{ __('QR Records') }}
+                {{ __('QR Record') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('a-logs')" :active="request()->routeIs('a-logs')">
                 {{ __('Logs') }}
